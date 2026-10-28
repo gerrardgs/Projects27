@@ -1,0 +1,2 @@
+# Pinned for reproducibility (checked on PyPI on 2026-10-15). Update deliberately.
+scikit-learn==1.9.1

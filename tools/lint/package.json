@@ -1,0 +1,17 @@
+{
+  "name": "projects23-lint",
+  "private": true,
+  "description": "Clean-code lint for this repository's own JavaScript and TypeScript (complexity <= 10, nesting <= 3, per rules 01 and 02).",
+  "type": "module",
+  "scripts": {
+    "lint": "cd ../.. && eslint --config tools/lint/eslint.config.mjs scripts .agents/skills/native-from-scratch/assets/node-http-service .agents/skills/security-hardening/assets/claude-code-guardrails .agents/skills/technical-documentation/assets apps/api/src apps/api/test"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.12.0",
+    "globals": "17.13.0",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.2",
+    "@types/node": "22.20.5"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "recommendations": [
+    "EditorConfig.EditorConfig",
+    "usernamehw.errorlens",
+    "streetsidesoftware.code-spell-checker",
+    "github.vscode-github-actions",
+    "redhat.vscode-yaml",
+    "davidanson.vscode-markdownlint",
+    "sonarsource.sonarlint-vscode",
+
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "vitest.explorer",
+    "ms-playwright.playwright",
+    "stylelint.vscode-stylelint",
+    "html-validate.vscode-html-validate",
+    "deque-systems.vscode-axe-linter",
+    "bradlc.vscode-tailwindcss",
+    "figma.figma-vscode-extension",
+    "yoavbls.pretty-ts-errors",
+
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-python.debugpy",
+    "charliermarsh.ruff",
+
+    "golang.go",
+
+    "rust-lang.rust-analyzer",
+    "vadimcn.vscode-lldb",
+
+    "ms-azuretools.vscode-containers"
+  ]
+}

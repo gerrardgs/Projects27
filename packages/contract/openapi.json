@@ -1,0 +1,4632 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Projects 27 core API",
+    "version": "0.4.0",
+    "description": "One contract for the web, iOS (Swift) and Android (Dart/Flutter) clients. Amounts are decimal strings in IDR, never JSON numbers. Errors use RFC 9457 problem details."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Local development"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    },
+    {
+      "cookieAuth": []
+    }
+  ],
+  "paths": {
+    "/v1/health": {
+      "get": {
+        "operationId": "health",
+        "summary": "Liveness and database check",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "const": "ok"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/register": {
+      "post": {
+        "operationId": "register",
+        "summary": "Create an account with a personal entity in IDR and the starting chart of accounts",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "userId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "entityId": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  },
+                  "required": [
+                    "userId",
+                    "entityId"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many attempts",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/login": {
+      "post": {
+        "operationId": "login",
+        "summary": "Sign in. Web clients receive an HttpOnly session cookie; native clients (iOS, Android) receive a bearer token",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/NativeSession"
+                    },
+                    {
+                      "$ref": "#/components/schemas/WebSession"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many attempts",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/logout": {
+      "post": {
+        "operationId": "logout",
+        "summary": "Revoke the current session",
+        "responses": {
+          "204": {
+            "description": "Signed out"
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/totp/setup": {
+      "post": {
+        "operationId": "startTotpSetup",
+        "summary": "Generate an authenticator secret (RFC 6238); two-factor stays off until enabled",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TotpSetup"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/totp/enable": {
+      "post": {
+        "operationId": "enableTotp",
+        "summary": "Turn on two-factor sign-in with a current code",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "pattern": "^[0-9]{6}$"
+                  }
+                },
+                "required": [
+                  "code"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Enabled"
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/me": {
+      "get": {
+        "operationId": "me",
+        "summary": "The signed-in user and the entities they belong to",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Me"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/entities/{entityId}/accounts": {
+      "parameters": [
+        {
+          "name": "entityId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "listAccounts",
+        "summary": "Chart of accounts",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "accounts": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Account"
+                      }
+                    }
+                  },
+                  "required": [
+                    "accounts"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createAccount",
+        "summary": "Add an account",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Account"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/entities/{entityId}/transactions": {
+      "parameters": [
+        {
+          "name": "entityId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "recordTransaction",
+        "summary": "Record an income, expense or transfer; posts a balanced two-line entry (or submits it where approval is required)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransactionInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalEntry"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Same idempotency key and body: the existing entry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalEntry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ledger rule violated",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/entities/{entityId}/journal-entries": {
+      "parameters": [
+        {
+          "name": "entityId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "listJournalEntries",
+        "summary": "Entries by date, newest first",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "examples": [
+                "2026-10-28"
+              ]
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "examples": [
+                "2026-10-28"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500,
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "entries": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/JournalEntry"
+                      }
+                    }
+                  },
+                  "required": [
+                    "entries"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createJournalEntry",
+        "summary": "Post a general balanced journal entry",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JournalEntryInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalEntry"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Same idempotency key and body: the existing entry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalEntry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ledger rule violated",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/entities/{entityId}/journal-entries/{entryId}": {
+      "parameters": [
+        {
+          "name": "entityId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "entryId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getJournalEntry",
+        "summary": "One entry with its lines",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalEntry"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/entities/{entityId}/journal-entries/{entryId}/reverse": {
+      "parameters": [
+        {
+          "name": "entityId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "entryId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "reverseJournalEntry",
+        "summary": "Correct a posted entry with a linked reversing entry; the original is never edited",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReverseInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The reversing entry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalEntry"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Already reversed by this request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalEntry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ledger rule violated",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/entities/{entityId}/journal-entries/{entryId}/approve": {
+      "parameters": [
+        {
+          "name": "entityId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "entryId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "approveJournalEntry",
+        "summary": "Post a submitted entry; the approver must not be its preparer",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalEntry"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ledger rule violated",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/entities/{entityId}/journal-entries/{entryId}/reject": {
+      "parameters": [
+        {
+          "name": "entityId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "entryId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "rejectJournalEntry",
+        "summary": "Reject a submitted entry with a reason",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalEntry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/entities/{entityId}/reports/{kind}": {
+      "parameters": [
+        {
+          "name": "entityId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "kind",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "enum": [
+              "monthly-recap",
+              "monthly-trend",
+              "trial-balance",
+              "income-statement",
+              "balance-sheet"
+            ]
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getReport",
+        "summary": "A report with self-checks. monthly-recap needs year and month; monthly-trend needs year and month (the last month) and optional months (1 to 24, default 12); income-statement needs from and to; trial-balance and balance-sheet need asOf",
+        "parameters": [
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 12
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "examples": [
+                "2026-10-28"
+              ]
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "examples": [
+                "2026-10-28"
+              ]
+            }
+          },
+          {
+            "name": "asOf",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "examples": [
+                "2026-10-28"
+              ]
+            }
+          },
+          {
+            "name": "months",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 24,
+              "default": 12
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/MonthlyRecap"
+                    },
+                    {
+                      "$ref": "#/components/schemas/MonthlyTrend"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TrialBalance"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncomeStatement"
+                    },
+                    {
+                      "$ref": "#/components/schemas/BalanceSheet"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/entities/{entityId}/periods": {
+      "parameters": [
+        {
+          "name": "entityId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "listPeriods",
+        "summary": "Months that were closed or reopened",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "periods": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Period"
+                      }
+                    }
+                  },
+                  "required": [
+                    "periods"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/entities/{entityId}/periods/{year}/{month}/close": {
+      "parameters": [
+        {
+          "name": "entityId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "year",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1900,
+            "maximum": 9999
+          }
+        },
+        {
+          "name": "month",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12
+          }
+        }
+      ],
+      "post": {
+        "operationId": "closePeriod",
+        "summary": "Close a month: no pending approvals, all report checks pass, snapshots stored with SHA-256 hashes",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PeriodClose"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ledger rule violated",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/entities/{entityId}/periods/{year}/{month}/reopen": {
+      "parameters": [
+        {
+          "name": "entityId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "year",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1900,
+            "maximum": 9999
+          }
+        },
+        {
+          "name": "month",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12
+          }
+        }
+      ],
+      "post": {
+        "operationId": "reopenPeriod",
+        "summary": "Reopen a closed month with a reason (audited)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReasonInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "year": {
+                      "type": "integer"
+                    },
+                    "month": {
+                      "type": "integer"
+                    },
+                    "status": {
+                      "const": "open"
+                    }
+                  },
+                  "required": [
+                    "year",
+                    "month",
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/entities/{entityId}/periods/{year}/{month}/snapshots": {
+      "parameters": [
+        {
+          "name": "entityId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "year",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1900,
+            "maximum": 9999
+          }
+        },
+        {
+          "name": "month",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12
+          }
+        }
+      ],
+      "get": {
+        "operationId": "listSnapshots",
+        "summary": "Frozen reports of a closed month with their hashes recomputed for cross-checking",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "snapshots": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Snapshot"
+                      }
+                    }
+                  },
+                  "required": [
+                    "snapshots"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/entities/{entityId}/audit/verify": {
+      "parameters": [
+        {
+          "name": "entityId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "verifyAuditChain",
+        "summary": "Recompute the entity's hash-chained audit trail",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChainCheck"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/entities/{entityId}/imports/preview": {
+      "parameters": [
+        {
+          "name": "entityId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "previewImport",
+        "summary": "Validate a CSV or XLSX file and mark rows already imported, without posting anything",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "File too large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/entities/{entityId}/imports/commit": {
+      "parameters": [
+        {
+          "name": "entityId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "commitImport",
+        "summary": "Post every valid row that was not imported before; each row has a stable idempotency key",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "File too large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/entities/{entityId}/reports/{kind}/xlsx": {
+      "parameters": [
+        {
+          "name": "entityId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "kind",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "enum": [
+              "monthly-recap",
+              "monthly-trend",
+              "trial-balance",
+              "income-statement",
+              "balance-sheet"
+            ]
+          }
+        }
+      ],
+      "get": {
+        "operationId": "exportReport",
+        "summary": "The same report as an Excel workbook; same query parameters as the JSON report",
+        "parameters": [
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 12
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "examples": [
+                "2026-10-28"
+              ]
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "examples": [
+                "2026-10-28"
+              ]
+            }
+          },
+          {
+            "name": "asOf",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "examples": [
+                "2026-10-28"
+              ]
+            }
+          },
+          {
+            "name": "months",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 24,
+              "default": 12
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Excel workbook (Office Open XML): the report, its self-checks and, for snapshots, a Verifikasi sheet with the SHA-256 hash",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/entities/{entityId}/periods/{year}/{month}/snapshots/{snapshotId}/xlsx": {
+      "parameters": [
+        {
+          "name": "entityId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "year",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "name": "month",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        },
+        {
+          "name": "snapshotId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "exportSnapshot",
+        "summary": "A closed month's frozen report as Excel, with its hash for cross-checking",
+        "responses": {
+          "200": {
+            "description": "Excel workbook (Office Open XML): the report, its self-checks and, for snapshots, a Verifikasi sheet with the SHA-256 hash",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ledger rule violated",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/entities/{entityId}/imports/inspect": {
+      "parameters": [
+        {
+          "name": "entityId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "inspectImport",
+        "summary": "Read the header row and the first five data rows of a CSV or XLSX file, to choose the column mapping",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "format": {
+                    "enum": [
+                      "csv",
+                      "xlsx"
+                    ]
+                  },
+                  "content": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "format",
+                  "content"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "header": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "sample": {
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "rowCount": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "header",
+                    "sample",
+                    "rowCount"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "File too large",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/entities/{entityId}/capture/parse": {
+      "parameters": [
+        {
+          "name": "entityId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "parseCapture",
+        "summary": "Turn a spoken or typed Indonesian sentence into a transaction draft for the capture form. Clients do speech recognition on the device and send the text. Nothing is posted.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1000,
+                    "examples": [
+                      "beli nasi padang 35 ribu pakai gopay kemarin"
+                    ]
+                  }
+                },
+                "required": [
+                  "text"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureDraft"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/entities/{entityId}/capture/{draftId}/review": {
+      "parameters": [
+        {
+          "name": "entityId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "draftId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "operationId": "reviewCapture",
+        "summary": "After Simpan, report which filled fields the person changed. Feeds the real-use quality report; only the draft's author can review it, once.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "outcome": {
+                    "const": "saved"
+                  },
+                  "changed": {
+                    "type": "array",
+                    "items": {
+                      "enum": [
+                        "kind",
+                        "amount",
+                        "date",
+                        "accountId",
+                        "fundingAccountId",
+                        "description",
+                        "counterparty"
+                      ]
+                    },
+                    "uniqueItems": true
+                  }
+                },
+                "required": [
+                  "outcome",
+                  "changed"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Recorded"
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Already reviewed",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/entities/{entityId}/capture/quality": {
+      "parameters": [
+        {
+          "name": "entityId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getCaptureQuality",
+        "summary": "Real-use quality of capture: share of saved forms the person did not correct, and per field how often the filled value was kept, with 95% Wilson intervals; overall and per method (AI or rules).",
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 366,
+              "default": 90
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureQuality"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not signed in",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Native apps: the token from POST /v1/auth/login with client \"native\""
+      },
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "p27_session",
+        "description": "Web app: HttpOnly cookie set by POST /v1/auth/login with client \"web\""
+      }
+    },
+    "schemas": {
+      "Amount": {
+        "type": "string",
+        "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+        "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+        "examples": [
+          "125000.50"
+        ]
+      },
+      "Check": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "passed": {
+            "type": "boolean"
+          },
+          "detail": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "passed",
+          "detail"
+        ]
+      },
+      "Problem": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "requestId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "title",
+          "status",
+          "detail",
+          "requestId"
+        ]
+      },
+      "RegisterInput": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "password": {
+            "type": "string",
+            "minLength": 12,
+            "maxLength": 128
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          }
+        },
+        "required": [
+          "email",
+          "password",
+          "displayName"
+        ]
+      },
+      "LoginInput": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "client": {
+            "enum": [
+              "web",
+              "native"
+            ]
+          },
+          "totp": {
+            "type": "string",
+            "pattern": "^[0-9]{6}$"
+          }
+        },
+        "required": [
+          "email",
+          "password",
+          "client"
+        ]
+      },
+      "NativeSession": {
+        "type": "object",
+        "description": "Store the token in the iOS Keychain or Android Keystore; send it as Authorization: Bearer <token>. Valid 30 days, revocable.",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "tokenType": {
+            "const": "Bearer"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "token",
+          "tokenType",
+          "expiresAt"
+        ],
+        "additionalProperties": false
+      },
+      "WebSession": {
+        "type": "object",
+        "description": "The session is in the HttpOnly p27_session cookie (12 hours). State-changing requests must come from an allowed Origin.",
+        "properties": {
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "expiresAt"
+        ],
+        "additionalProperties": false
+      },
+      "TotpSetup": {
+        "type": "object",
+        "properties": {
+          "secret": {
+            "type": "string",
+            "description": "Base32 (RFC 4648)"
+          },
+          "otpauthUri": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "secret",
+          "otpauthUri"
+        ]
+      },
+      "Me": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "twoFactorEnabled": {
+            "type": "boolean"
+          },
+          "entities": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "individual",
+                    "company"
+                  ]
+                },
+                "currency": {
+                  "const": "IDR"
+                },
+                "role": {
+                  "enum": [
+                    "owner",
+                    "controller",
+                    "accountant",
+                    "approver",
+                    "preparer",
+                    "viewer",
+                    "auditor"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "kind",
+                "currency",
+                "role"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "displayName",
+          "twoFactorEnabled",
+          "entities"
+        ]
+      },
+      "Account": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^[0-9]{3,6}$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "asset",
+              "liability",
+              "equity",
+              "income",
+              "expense"
+            ]
+          },
+          "postable": {
+            "type": "boolean"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name",
+          "type",
+          "postable",
+          "active"
+        ]
+      },
+      "AccountInput": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[0-9]{3,6}$"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "type": {
+            "enum": [
+              "asset",
+              "liability",
+              "equity",
+              "income",
+              "expense"
+            ]
+          }
+        },
+        "required": [
+          "code",
+          "name",
+          "type"
+        ]
+      },
+      "TransactionInput": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "enum": [
+              "income",
+              "expense",
+              "transfer"
+            ]
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "examples": [
+              "2026-10-28"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "counterparty": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^(0|[1-9][0-9]{0,14})(\\.[0-9]{1,2})?$",
+            "description": "Non-negative decimal string with at most two decimals, for example \"125000\" or \"125000.50\"."
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "income or expense account; for a transfer, the account that receives the money"
+          },
+          "fundingAccountId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "asset or liability account the money comes from or goes to"
+          },
+          "memo": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Send a new random key per user action; retries with the same key and body return the same entry"
+          }
+        },
+        "required": [
+          "kind",
+          "date",
+          "description",
+          "amount",
+          "accountId",
+          "fundingAccountId"
+        ]
+      },
+      "JournalEntryInput": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "examples": [
+              "2026-10-28"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "counterparty": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "lines": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "properties": {
+                "accountId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "debit": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9][0-9]{0,14})(\\.[0-9]{1,2})?$",
+                  "description": "Non-negative decimal string with at most two decimals, for example \"125000\" or \"125000.50\"."
+                },
+                "credit": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9][0-9]{0,14})(\\.[0-9]{1,2})?$",
+                  "description": "Non-negative decimal string with at most two decimals, for example \"125000\" or \"125000.50\"."
+                },
+                "memo": {
+                  "type": "string",
+                  "maxLength": 500
+                }
+              },
+              "required": [
+                "accountId"
+              ]
+            }
+          }
+        },
+        "required": [
+          "date",
+          "description",
+          "lines"
+        ]
+      },
+      "ReverseInput": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "examples": [
+              "2026-10-28"
+            ],
+            "description": "Defaults to the original date; must be in an open month"
+          }
+        },
+        "required": [
+          "reason"
+        ]
+      },
+      "DecisionInput": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 500
+          }
+        }
+      },
+      "ReasonInput": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "reason"
+        ]
+      },
+      "JournalLine": {
+        "type": "object",
+        "properties": {
+          "lineNo": {
+            "type": "integer"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "accountCode": {
+            "type": "string"
+          },
+          "accountName": {
+            "type": "string"
+          },
+          "debit": {
+            "type": "string",
+            "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+            "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+            "examples": [
+              "125000.50"
+            ]
+          },
+          "credit": {
+            "type": "string",
+            "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+            "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+            "examples": [
+              "125000.50"
+            ]
+          },
+          "memo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "lineNo",
+          "accountId",
+          "accountCode",
+          "accountName",
+          "debit",
+          "credit",
+          "memo"
+        ]
+      },
+      "JournalEntry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "entityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "examples": [
+              "2026-10-28"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "counterparty": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source": {
+            "enum": [
+              "manual",
+              "transaction",
+              "import",
+              "reversal"
+            ]
+          },
+          "status": {
+            "enum": [
+              "submitted",
+              "posted",
+              "reversed",
+              "rejected"
+            ]
+          },
+          "currency": {
+            "const": "IDR"
+          },
+          "total": {
+            "type": "string",
+            "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+            "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+            "examples": [
+              "125000.50"
+            ]
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JournalLine"
+            }
+          },
+          "reversesEntryId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "reversedByEntryId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdBy": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "postedBy": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "postedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "entityId",
+          "date",
+          "description",
+          "source",
+          "status",
+          "currency",
+          "total",
+          "lines",
+          "createdBy",
+          "createdAt"
+        ]
+      },
+      "MonthlyRecap": {
+        "type": "object",
+        "properties": {
+          "entityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "entityName": {
+            "type": "string"
+          },
+          "currency": {
+            "const": "IDR"
+          },
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Check"
+            }
+          },
+          "kind": {
+            "const": "monthly-recap"
+          },
+          "period": {
+            "type": "object",
+            "properties": {
+              "year": {
+                "type": "integer"
+              },
+              "month": {
+                "type": "integer"
+              },
+              "from": {
+                "type": "string",
+                "format": "date",
+                "examples": [
+                  "2026-10-28"
+                ]
+              },
+              "to": {
+                "type": "string",
+                "format": "date",
+                "examples": [
+                  "2026-10-28"
+                ]
+              }
+            }
+          },
+          "income": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "accountId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "month": {
+                  "type": "string",
+                  "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+                  "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+                  "examples": [
+                    "125000.50"
+                  ]
+                },
+                "previousMonth": {
+                  "type": "string",
+                  "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+                  "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+                  "examples": [
+                    "125000.50"
+                  ]
+                },
+                "change": {
+                  "type": "string",
+                  "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+                  "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+                  "examples": [
+                    "125000.50"
+                  ]
+                },
+                "yearToDate": {
+                  "type": "string",
+                  "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+                  "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+                  "examples": [
+                    "125000.50"
+                  ]
+                },
+                "shareOfTotal": {
+                  "type": "string",
+                  "pattern": "^-?[0-9]+\\.[0-9]{2}$",
+                  "description": "Percentage truncated to two decimals"
+                }
+              }
+            }
+          },
+          "expenses": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "accountId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "month": {
+                  "type": "string",
+                  "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+                  "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+                  "examples": [
+                    "125000.50"
+                  ]
+                },
+                "previousMonth": {
+                  "type": "string",
+                  "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+                  "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+                  "examples": [
+                    "125000.50"
+                  ]
+                },
+                "change": {
+                  "type": "string",
+                  "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+                  "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+                  "examples": [
+                    "125000.50"
+                  ]
+                },
+                "yearToDate": {
+                  "type": "string",
+                  "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+                  "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+                  "examples": [
+                    "125000.50"
+                  ]
+                },
+                "shareOfTotal": {
+                  "type": "string",
+                  "pattern": "^-?[0-9]+\\.[0-9]{2}$",
+                  "description": "Percentage truncated to two decimals"
+                }
+              }
+            }
+          },
+          "totalIncome": {
+            "type": "string",
+            "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+            "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+            "examples": [
+              "125000.50"
+            ]
+          },
+          "totalExpenses": {
+            "type": "string",
+            "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+            "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+            "examples": [
+              "125000.50"
+            ]
+          },
+          "net": {
+            "type": "string",
+            "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+            "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+            "examples": [
+              "125000.50"
+            ]
+          },
+          "savingsRate": {
+            "type": "string",
+            "pattern": "^-?[0-9]+\\.[0-9]{2}$",
+            "description": "Percentage truncated to two decimals"
+          }
+        },
+        "required": [
+          "kind",
+          "income",
+          "expenses",
+          "totalIncome",
+          "totalExpenses",
+          "net",
+          "savingsRate",
+          "checks"
+        ]
+      },
+      "TrialBalance": {
+        "type": "object",
+        "properties": {
+          "entityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "entityName": {
+            "type": "string"
+          },
+          "currency": {
+            "const": "IDR"
+          },
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Check"
+            }
+          },
+          "kind": {
+            "const": "trial-balance"
+          },
+          "asOf": {
+            "type": "string",
+            "format": "date",
+            "examples": [
+              "2026-10-28"
+            ]
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "accountId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "debit": {
+                  "type": "string",
+                  "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+                  "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+                  "examples": [
+                    "125000.50"
+                  ]
+                },
+                "credit": {
+                  "type": "string",
+                  "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+                  "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+                  "examples": [
+                    "125000.50"
+                  ]
+                }
+              }
+            }
+          },
+          "totalDebit": {
+            "type": "string",
+            "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+            "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+            "examples": [
+              "125000.50"
+            ]
+          },
+          "totalCredit": {
+            "type": "string",
+            "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+            "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+            "examples": [
+              "125000.50"
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "asOf",
+          "lines",
+          "totalDebit",
+          "totalCredit",
+          "checks"
+        ]
+      },
+      "IncomeStatement": {
+        "type": "object",
+        "properties": {
+          "entityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "entityName": {
+            "type": "string"
+          },
+          "currency": {
+            "const": "IDR"
+          },
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Check"
+            }
+          },
+          "kind": {
+            "const": "income-statement"
+          },
+          "period": {
+            "type": "object",
+            "properties": {
+              "from": {
+                "type": "string",
+                "format": "date",
+                "examples": [
+                  "2026-10-28"
+                ]
+              },
+              "to": {
+                "type": "string",
+                "format": "date",
+                "examples": [
+                  "2026-10-28"
+                ]
+              }
+            }
+          },
+          "income": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "accountId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "amount": {
+                  "type": "string",
+                  "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+                  "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+                  "examples": [
+                    "125000.50"
+                  ]
+                }
+              }
+            }
+          },
+          "expenses": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "accountId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "amount": {
+                  "type": "string",
+                  "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+                  "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+                  "examples": [
+                    "125000.50"
+                  ]
+                }
+              }
+            }
+          },
+          "totalIncome": {
+            "type": "string",
+            "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+            "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+            "examples": [
+              "125000.50"
+            ]
+          },
+          "totalExpenses": {
+            "type": "string",
+            "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+            "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+            "examples": [
+              "125000.50"
+            ]
+          },
+          "net": {
+            "type": "string",
+            "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+            "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+            "examples": [
+              "125000.50"
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "income",
+          "expenses",
+          "totalIncome",
+          "totalExpenses",
+          "net",
+          "checks"
+        ]
+      },
+      "BalanceSheet": {
+        "type": "object",
+        "properties": {
+          "entityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "entityName": {
+            "type": "string"
+          },
+          "currency": {
+            "const": "IDR"
+          },
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Check"
+            }
+          },
+          "kind": {
+            "const": "balance-sheet"
+          },
+          "asOf": {
+            "type": "string",
+            "format": "date",
+            "examples": [
+              "2026-10-28"
+            ]
+          },
+          "assets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "accountId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "amount": {
+                  "type": "string",
+                  "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+                  "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+                  "examples": [
+                    "125000.50"
+                  ]
+                }
+              }
+            }
+          },
+          "liabilities": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "accountId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "amount": {
+                  "type": "string",
+                  "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+                  "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+                  "examples": [
+                    "125000.50"
+                  ]
+                }
+              }
+            }
+          },
+          "equity": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "accountId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "amount": {
+                  "type": "string",
+                  "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+                  "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+                  "examples": [
+                    "125000.50"
+                  ]
+                }
+              }
+            }
+          },
+          "accumulatedEarnings": {
+            "type": "string",
+            "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+            "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+            "examples": [
+              "125000.50"
+            ]
+          },
+          "totalAssets": {
+            "type": "string",
+            "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+            "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+            "examples": [
+              "125000.50"
+            ]
+          },
+          "totalLiabilities": {
+            "type": "string",
+            "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+            "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+            "examples": [
+              "125000.50"
+            ]
+          },
+          "totalEquity": {
+            "type": "string",
+            "pattern": "^-?(0|[1-9][0-9]{0,14})\\.[0-9]{2}$",
+            "description": "Exact decimal string in IDR with two decimals (ISO 4217: 2 minor units), for example \"125000.50\". Never a JSON number.",
+            "examples": [
+              "125000.50"
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "asOf",
+          "assets",
+          "liabilities",
+          "equity",
+          "accumulatedEarnings",
+          "totalAssets",
+          "totalLiabilities",
+          "totalEquity",
+          "checks"
+        ]
+      },
+      "Period": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "integer"
+          },
+          "month": {
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "open",
+              "closed"
+            ]
+          },
+          "changedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "year",
+          "month",
+          "status",
+          "changedAt",
+          "reason"
+        ]
+      },
+      "PeriodClose": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "integer"
+          },
+          "month": {
+            "type": "integer"
+          },
+          "status": {
+            "const": "closed"
+          },
+          "snapshots": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "kind": {
+                  "type": "string"
+                },
+                "contentHash": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "id",
+                "kind",
+                "contentHash"
+              ]
+            }
+          }
+        },
+        "required": [
+          "year",
+          "month",
+          "status",
+          "snapshots"
+        ]
+      },
+      "Snapshot": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "contentHash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "hashVerified": {
+            "type": "boolean"
+          },
+          "report": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "createdAt",
+          "contentHash",
+          "hashVerified",
+          "report"
+        ]
+      },
+      "ChainCheck": {
+        "type": "object",
+        "properties": {
+          "events": {
+            "type": "integer"
+          },
+          "valid": {
+            "type": "boolean"
+          },
+          "firstInvalidSeq": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "events",
+          "valid",
+          "firstInvalidSeq"
+        ]
+      },
+      "ImportRequest": {
+        "type": "object",
+        "description": "The first row of the file is the header; mapping names the header of each column. Send at most 5000 data rows and 8 MiB.",
+        "properties": {
+          "format": {
+            "enum": [
+              "csv",
+              "xlsx"
+            ]
+          },
+          "content": {
+            "type": "string",
+            "description": "CSV text, or the XLSX file base64-encoded"
+          },
+          "dateFormat": {
+            "enum": [
+              "YYYY-MM-DD",
+              "DD/MM/YYYY",
+              "MM/DD/YYYY"
+            ],
+            "default": "YYYY-MM-DD"
+          },
+          "decimalSeparator": {
+            "enum": [
+              ",",
+              "."
+            ],
+            "default": "."
+          },
+          "mapping": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "account": {
+                "type": "string"
+              },
+              "funding": {
+                "type": "string"
+              },
+              "counterparty": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "date",
+              "description",
+              "amount"
+            ]
+          },
+          "defaults": {
+            "type": "object",
+            "description": "Account codes used when a row has no account or funding column",
+            "properties": {
+              "funding": {
+                "type": "string"
+              },
+              "income": {
+                "type": "string"
+              },
+              "expense": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "funding",
+              "income",
+              "expense"
+            ]
+          }
+        },
+        "required": [
+          "format",
+          "content",
+          "mapping",
+          "defaults"
+        ]
+      },
+      "ImportRow": {
+        "type": "object",
+        "properties": {
+          "row": {
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "duplicate",
+              "error"
+            ]
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "date": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "kind": {
+            "enum": [
+              "income",
+              "expense",
+              "transfer",
+              null
+            ]
+          },
+          "amount": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "accountCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "fundingCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "counterparty": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "idempotencyKey": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "row",
+          "status",
+          "message",
+          "date",
+          "description",
+          "kind",
+          "amount",
+          "accountCode",
+          "fundingCode",
+          "counterparty",
+          "idempotencyKey"
+        ]
+      },
+      "ImportResult": {
+        "type": "object",
+        "properties": {
+          "summary": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer"
+              },
+              "ok": {
+                "type": "integer"
+              },
+              "duplicate": {
+                "type": "integer"
+              },
+              "error": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "total",
+              "ok",
+              "duplicate",
+              "error"
+            ]
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImportRow"
+            }
+          }
+        },
+        "required": [
+          "summary",
+          "rows"
+        ]
+      },
+      "MonthlyTrend": {
+        "type": "object",
+        "properties": {
+          "entityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "entityName": {
+            "type": "string"
+          },
+          "currency": {
+            "const": "IDR"
+          },
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "kind": {
+            "const": "monthly-trend"
+          },
+          "period": {
+            "type": "object",
+            "properties": {
+              "year": {
+                "type": "integer"
+              },
+              "month": {
+                "type": "integer"
+              },
+              "months": {
+                "type": "integer"
+              }
+            }
+          },
+          "series": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "year": {
+                  "type": "integer"
+                },
+                "month": {
+                  "type": "integer"
+                },
+                "income": {
+                  "$ref": "#/components/schemas/Amount"
+                },
+                "expenses": {
+                  "$ref": "#/components/schemas/Amount"
+                },
+                "net": {
+                  "$ref": "#/components/schemas/Amount"
+                }
+              },
+              "required": [
+                "year",
+                "month",
+                "income",
+                "expenses",
+                "net"
+              ]
+            }
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Check"
+            }
+          }
+        },
+        "required": [
+          "kind",
+          "series",
+          "checks"
+        ]
+      },
+      "CaptureDraft": {
+        "type": "object",
+        "description": "A filled-in, unsaved transaction form. The client shows it for review; the person presses Simpan to post it with POST .../transactions.",
+        "properties": {
+          "draftId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Send it back with the review after Simpan."
+          },
+          "kind": {
+            "enum": [
+              "income",
+              "expense",
+              "transfer"
+            ]
+          },
+          "amount": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^(0|[1-9][0-9]{0,14})\\.[0-9]{2}$"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "accountId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "accountCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "fundingAccountId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "fundingCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "counterparty": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source": {
+            "enum": [
+              "ai",
+              "rules"
+            ],
+            "description": "ai: proposed by the configured model and validated field by field; rules: the built-in Indonesian parser"
+          },
+          "model": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "missing": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "amount",
+                "accountId",
+                "fundingAccountId",
+                "description"
+              ]
+            }
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "draftId",
+          "kind",
+          "amount",
+          "date",
+          "accountId",
+          "accountCode",
+          "fundingAccountId",
+          "fundingCode",
+          "description",
+          "counterparty",
+          "source",
+          "model",
+          "missing",
+          "note"
+        ],
+        "additionalProperties": false
+      },
+      "QualityRate": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "of": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "rate": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 1
+          },
+          "ci95": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "minItems": 2,
+            "maxItems": 2,
+            "description": "95% Wilson score interval"
+          }
+        },
+        "required": [
+          "count",
+          "of",
+          "rate",
+          "ci95"
+        ]
+      },
+      "CaptureQualitySummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "drafts": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "saved": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "savedWithoutChanges": {
+            "$ref": "#/components/schemas/QualityRate"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "field": {
+                  "enum": [
+                    "kind",
+                    "amount",
+                    "date",
+                    "accountId",
+                    "fundingAccountId",
+                    "description",
+                    "counterparty"
+                  ]
+                },
+                "kept": {
+                  "$ref": "#/components/schemas/QualityRate"
+                }
+              },
+              "required": [
+                "field",
+                "kept"
+              ]
+            }
+          },
+          "latencyMs": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "p50": {
+                "type": "number"
+              },
+              "p95": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "p50",
+              "p95"
+            ]
+          }
+        },
+        "required": [
+          "drafts",
+          "saved",
+          "savedWithoutChanges",
+          "fields",
+          "latencyMs"
+        ]
+      },
+      "CaptureQuality": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "days": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 366
+          },
+          "drafts": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "saved": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "savedWithoutChanges": {
+            "$ref": "#/components/schemas/QualityRate"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "field": {
+                  "enum": [
+                    "kind",
+                    "amount",
+                    "date",
+                    "accountId",
+                    "fundingAccountId",
+                    "description",
+                    "counterparty"
+                  ]
+                },
+                "kept": {
+                  "$ref": "#/components/schemas/QualityRate"
+                }
+              },
+              "required": [
+                "field",
+                "kept"
+              ]
+            }
+          },
+          "latencyMs": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "p50": {
+                "type": "number"
+              },
+              "p95": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "p50",
+              "p95"
+            ]
+          },
+          "bySource": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "ai": {
+                "$ref": "#/components/schemas/CaptureQualitySummary"
+              },
+              "rules": {
+                "$ref": "#/components/schemas/CaptureQualitySummary"
+              }
+            },
+            "required": [
+              "ai",
+              "rules"
+            ]
+          }
+        },
+        "required": [
+          "days",
+          "drafts",
+          "saved",
+          "savedWithoutChanges",
+          "fields",
+          "latencyMs",
+          "bySource"
+        ]
+      }
+    }
+  }
+}

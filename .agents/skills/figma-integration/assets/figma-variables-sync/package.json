@@ -1,0 +1,19 @@
+{
+  "name": "figma-variables-sync",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "sync": "node cli.ts",
+    "test": "node --test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@figma/rest-api-spec": "^0.44.0",
+    "@types/node": "^22.18.0",
+    "typescript": "^7.0.2"
+  }
+}

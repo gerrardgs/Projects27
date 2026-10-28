@@ -1,0 +1,25 @@
+# Copy to .github/dependabot.yml. Keeps SHA-pinned actions and dependencies up to date, checked daily.
+# Turn on Dependabot security updates in the repository settings: they are raised as soon as an advisory is
+# published, and the cooldown below never delays them.
+# Version updates wait 7 days after each release so a compromised release is likely to be detected and yanked
+# before it reaches you (zizmor's dependabot-cooldown audit flags anything shorter).
+# Pair with dependabot-auto-merge.yml to merge patch and minor updates automatically once required checks pass.
+# Replace or add package ecosystems to match the project (npm, pip, uv, gomod, cargo, maven, gradle, nuget, docker).
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: daily
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ["*"]
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: daily
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 10

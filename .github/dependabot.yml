@@ -1,0 +1,131 @@
+# Keeps every dependency current: checks run daily, and Dependabot's security updates are raised as soon as an
+# advisory is published (the cooldown never applies to security updates).
+# Version updates wait 7 days after each release, so that a compromised release is likely to be detected and
+# pulled before it is proposed (zizmor's dependabot-cooldown audit treats anything shorter as insufficient).
+# Patch and minor updates merge automatically once required checks pass (.github/workflows/dependabot-auto-merge.yml).
+# What Dependabot cannot see (gitleaks, the Python template's tools, Node.js and Python versions in CI) is checked
+# daily by .github/workflows/freshness.yml.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: daily
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ["*"]
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: daily
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+  - package-ecosystem: npm
+    directory: /.agents/skills/native-from-scratch/assets/node-http-service
+    schedule:
+      interval: daily
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+  - package-ecosystem: docker
+    directories:
+      - /.agents/skills/native-from-scratch/assets/node-http-service
+      - /.agents/skills/native-from-scratch/assets/python-http-service
+    schedule:
+      interval: daily
+    cooldown:
+      default-days: 7
+    ignore:
+      - dependency-name: "node"
+        update-types: ["version-update:semver-major"]
+  - package-ecosystem: npm
+    directories:
+      - /.agents/skills/design-system-and-tokens/assets/design-tokens
+      - /.agents/skills/frontend-from-scratch/assets/static-site
+      - /.agents/skills/accessibility-audit/assets/axe-check
+      - /.agents/skills/figma-integration/assets/figma-variables-sync
+      - /.agents/skills/resilience-and-chaos-engineering/assets/browser-chaos
+      - /.agents/skills/video-editing-and-post-production/assets/web-media-pipeline
+    schedule:
+      interval: daily
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 10
+    groups:
+      front-end-templates:
+        patterns: ["*"]
+    ignore:
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+  - package-ecosystem: pip
+    directory: /.github/ci-tools
+    schedule:
+      interval: daily
+    cooldown:
+      default-days: 7
+    groups:
+      ci-tools:
+        patterns: ["*"]
+  - package-ecosystem: pip
+    directory: /.agents/skills/machine-learning/assets/baseline-classifier
+    schedule:
+      interval: daily
+    cooldown:
+      default-days: 7
+  - package-ecosystem: pip
+    directory: /.agents/skills/api-integration/assets/python-integration-kit
+    schedule:
+      interval: daily
+    cooldown:
+      default-days: 7
+  - package-ecosystem: pip
+    directory: /.agents/skills/chaos-engineering/assets/chaos-experiment-kit
+    schedule:
+      interval: daily
+    cooldown:
+      default-days: 7
+  - package-ecosystem: pip
+    directory: /.agents/skills/ai-agent-systems/assets/mcp-toolbox-sqlite
+    schedule:
+      interval: daily
+    cooldown:
+      default-days: 7
+  - package-ecosystem: npm
+    directory: /tools/lint
+    schedule:
+      interval: daily
+    cooldown:
+      default-days: 7
+    ignore:
+      # typescript-eslint 8 declares the peer range typescript >=4.8.4 <6.1.0.
+      - dependency-name: "typescript"
+        versions: [">=6.1.0"]
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+  - package-ecosystem: pip
+    directory: /tools/ci
+    schedule:
+      interval: daily
+    cooldown:
+      default-days: 7
+  - package-ecosystem: npm
+    directory: /apps/api
+    schedule:
+      interval: daily
+    cooldown:
+      default-days: 7
+  - package-ecosystem: npm
+    directory: /apps/web
+    schedule:
+      interval: daily
+    cooldown:
+      default-days: 7

@@ -1,0 +1,8 @@
+# Python tools used by .github/workflows/validate.yml. Exact pins keep CI reproducible;
+# Dependabot (pip ecosystem, /tools/ci) proposes updates after a 7-day cooldown.
+actionlint-py==1.7.12.25
+pip-audit==2.10.1
+pyyaml==6.0.3
+ruff==0.17.0
+shellcheck-py==0.11.0.1
+zizmor==1.30.1

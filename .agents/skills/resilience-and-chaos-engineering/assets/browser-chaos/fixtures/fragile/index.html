@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fragile fixture</title>
+    <script type="module" src="fragile.js"></script>
+  </head>
+  <body>
+    <a href="#main">Skip to main content</a>
+    <main id="main">
+      <h1>Fragile page</h1>
+      <!-- Deliberate faults: the theme button is shown without JavaScript, and the form is built by JavaScript. -->
+      <button type="button" id="theme-toggle">Dark theme</button>
+      <div id="form-root"></div>
+    </main>
+  </body>
+</html>

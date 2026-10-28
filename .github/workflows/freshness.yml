@@ -1,0 +1,60 @@
+name: Freshness and vulnerability watch
+
+# Runs every day, so new releases and new advisories surface even when nothing in the repository changed.
+# Dependabot opens update pull requests for npm, GitHub Actions, Docker and the CI's pip tools; this workflow
+# covers what it cannot see and fails (which notifies the maintainer) when something needs attention.
+
+on:
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: freshness
+  cancel-in-progress: true
+
+jobs:
+  pins:
+    name: Pinned tools and tested runtimes are current
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - name: Compare pins with the latest releases (.github/freshness.json)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/check-freshness.mjs
+
+  advisories:
+    name: No unaccepted high or critical advisories
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14"
+      - name: npm audit of every lockfile (accepted risks expire, see .github/accepted-advisories.json)
+        run: node scripts/audit-lockfiles.mjs
+      - name: pip-audit of the Python template's tools
+        working-directory: .agents/skills/native-from-scratch/assets/python-http-service
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --group dev
+          pip-audit --strict

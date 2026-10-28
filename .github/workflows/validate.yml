@@ -1,0 +1,517 @@
+name: Validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  secrets:
+    name: Secret scan (gitleaks, full history)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GITLEAKS_VERSION: 8.30.1
+      # From the release's gitleaks_8.30.1_checksums.txt; the download is rejected if it does not match.
+      GITLEAKS_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install gitleaks (pinned version, verified checksum)
+        run: |
+          archive="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl -fsSL -o "$RUNNER_TEMP/$archive" "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/$archive"
+          echo "${GITLEAKS_SHA256}  $RUNNER_TEMP/$archive" | sha256sum --check --strict
+          tar -xzf "$RUNNER_TEMP/$archive" -C "$RUNNER_TEMP" gitleaks
+      - name: Scan every commit
+        run: '"$RUNNER_TEMP/gitleaks" git . --redact --no-banner --exit-code 1'
+      - name: Scan the checked-out files
+        run: '"$RUNNER_TEMP/gitleaks" dir . --redact --no-banner --exit-code 1'
+
+  authorship:
+    name: Authorship (only the human author, full history)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - name: No commit credits an AI agent (rule 08 section 2)
+        run: node scripts/check-authorship.mjs
+
+  spec:
+    name: Spec, scripts and workflows
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14"
+      - run: npm ci
+      - name: Format and lint all code (Biome, including cognitive complexity)
+        run: npm run lint
+      - name: Script self-tests
+        run: node --test "scripts/*.test.mjs"
+      - name: Documentation kit tests (templates match the checker; a filled set passes)
+        run: node --test ".agents/skills/project-documentation/assets/docs-kit/*.test.mjs"
+      - name: Agent guardrail hook tests
+        run: node --test ".agents/skills/security-hardening/assets/claude-code-guardrails/*.test.mjs"
+      - name: Technical documentation checker tests
+        run: node --test ".agents/skills/technical-documentation/assets/*.test.mjs"
+      - name: Validate rules, skills, mirror and links
+        run: node scripts/agents-sync.mjs --check --all-markdown
+      - name: Install lint tools
+        # Exact pins in .github/ci-tools/requirements.txt, kept current by Dependabot (pip).
+        run: python -m pip install -r .github/ci-tools/requirements.txt
+      - name: Cross-check frontmatter with a full YAML parser
+        shell: python
+        run: |
+          import pathlib, re, sys, yaml
+          files = sorted(pathlib.Path(".agents").rglob("*.md"))
+          failures = 0
+          for path in files:
+              match = re.match(r"^---\n(.*?)\n---", path.read_text(encoding="utf-8"), re.S)
+              if not match:
+                  continue
+              try:
+                  yaml.safe_load(match.group(1))
+              except yaml.YAMLError as error:
+                  failures += 1
+                  print(f"{path}: {error}")
+          print(f"checked {len(files)} files, {failures} invalid")
+          sys.exit(1 if failures else 0)
+      - name: Lint shell scripts
+        run: shellcheck --severity=style scripts/install.sh
+      - name: Lint workflows
+        run: actionlint
+      - name: Audit workflows
+        run: zizmor --offline .
+      - name: Release notes exist for the current version
+        run: |
+          version="$(node -p 'require("./package.json").version')"
+          notes=".github/releases/v$version.md"
+          test -f "$notes" || { echo "::error::add $notes (the release workflow publishes it)"; exit 1; }
+          head -n 1 "$notes" | grep -q "^# v$version - " || { echo "::error::$notes must start with '# v$version - <title>'"; exit 1; }
+      - name: Installer leaves an existing project's files alone
+        run: |
+          target="$RUNNER_TEMP/existing-project"
+          mkdir -p "$target"
+          printf '# Existing README\n' > "$target/README.md"
+          printf 'existing agent rules\n' > "$target/AGENTS.md"
+          bash scripts/install.sh --source . "$target"
+          grep -qx '# Existing README' "$target/README.md"
+          grep -qx 'existing agent rules' "$target/AGENTS.md"
+          test ! -e "$target/LICENSE"
+      - name: Installer produces a valid spec in a new project
+        run: |
+          target="$RUNNER_TEMP/new-project"
+          mkdir -p "$target"
+          bash scripts/install.sh --source . "$target"
+          test -f "$target/.claude/settings.json" && test -f "$target/scripts/hooks/guard-deletions.mjs"
+          cd "$target" && node scripts/agents-sync.mjs --check
+
+  api:
+    name: Core API (Node.js ${{ matrix.node-version }}, PostgreSQL 18.6)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [24, 26]
+    services:
+      postgres:
+        # postgres:18.6, digest resolved from Docker Hub on 2026-10-28
+        image: postgres@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6
+        env:
+          POSTGRES_PASSWORD: ci-only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+        env:
+          TEST_DATABASE_URL: postgres://postgres:ci-only@localhost:5432/postgres
+      - run: npm audit --audit-level=high
+
+  web:
+    name: Web app (typecheck, unit, build, end-to-end with axe)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        # postgres:18.6, digest resolved from Docker Hub on 2026-10-28
+        image: postgres@sha256:edb0c08dc33befd0262ab3b5cf1c4f3f8cfd8b09e88c05b45adee29d6761ddb6
+        env:
+          POSTGRES_PASSWORD: ci-only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - run: npm ci
+        working-directory: apps/api
+      - run: npm ci
+        working-directory: apps/web
+      - run: npm run typecheck
+        working-directory: apps/web
+      - run: npm test
+        working-directory: apps/web
+      - run: npm run build
+        working-directory: apps/web
+      - run: npx --no-install playwright install --with-deps chromium
+        working-directory: apps/web
+      - run: npm run e2e
+        working-directory: apps/web
+        env:
+          E2E_DATABASE_URL: postgres://postgres:ci-only@localhost:5432/p27_e2e
+      - run: npm audit --omit=dev --audit-level=high
+        working-directory: apps/web
+
+  node-template:
+    name: Node.js template (Node.js ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [22, 24, 26]
+    defaults:
+      run:
+        working-directory: .agents/skills/native-from-scratch/assets/node-http-service
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm audit --audit-level=high
+
+  design-tokens-template:
+    name: Design tokens template (Node.js ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [22, 24, 26]
+    defaults:
+      run:
+        working-directory: .agents/skills/design-system-and-tokens/assets/design-tokens
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - name: Contrast check for every theme
+        run: npm run check
+      - run: npm audit --audit-level=high
+
+  figma-variables-template:
+    name: Figma variables sync template (Node.js ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [22, 24, 26]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node-version }}
+      # The tests import the token pipeline from the design-tokens template, so both need dependencies.
+      - run: npm ci
+        working-directory: .agents/skills/design-system-and-tokens/assets/design-tokens
+      - run: npm ci
+        working-directory: .agents/skills/figma-integration/assets/figma-variables-sync
+      - run: npm run typecheck
+        working-directory: .agents/skills/figma-integration/assets/figma-variables-sync
+      - run: npm test
+        working-directory: .agents/skills/figma-integration/assets/figma-variables-sync
+      - run: npm audit --audit-level=high
+        working-directory: .agents/skills/figma-integration/assets/figma-variables-sync
+
+  static-site-template:
+    name: Static site template (Node.js ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [22, 24, 26]
+    defaults:
+      run:
+        working-directory: .agents/skills/frontend-from-scratch/assets/static-site
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      # The page ships no npm packages to browsers; its dev tools (Stylelint) depend on braces,
+      # whose advisory GHSA-vfj7-8cjw-p6xm had no patched release on 2026-10-15. Dependabot reports it.
+      - run: npm audit --omit=dev --audit-level=high
+
+  web-media-template:
+    name: Web media pipeline template (Node.js ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [22, 24, 26]
+    defaults:
+      run:
+        working-directory: .agents/skills/video-editing-and-post-production/assets/web-media-pipeline
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node-version }}
+      # The video tests encode real files, so they need FFmpeg (with libx264, SVT-AV1 and Opus) and ffprobe.
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ffmpeg
+          ffmpeg -hide_banner -encoders | grep -E 'libx264|libsvtav1|libopus'
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm audit --audit-level=high
+
+  accessibility-scan:
+    name: Accessibility and chaos checks of the static site
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - name: Install the scanner and Chromium
+        working-directory: .agents/skills/accessibility-audit/assets/axe-check
+        run: |
+          npm ci
+          npx --no-install playwright install --with-deps chromium
+      - name: Scan the starter page
+        run: |
+          site=.agents/skills/frontend-from-scratch/assets/static-site
+          PORT=8080 node "$site/serve.js" &
+          for _ in $(seq 1 20); do curl -fsS http://127.0.0.1:8080/ >/dev/null && break; sleep 0.5; done
+          node .agents/skills/accessibility-audit/assets/axe-check/check.mjs http://127.0.0.1:8080/
+      - name: Chaos experiments (tests prove they can fail, then run against the starter page)
+        working-directory: .agents/skills/resilience-and-chaos-engineering/assets/browser-chaos
+        run: |
+          npm ci
+          npm test
+          node chaos.mjs http://127.0.0.1:8080/
+
+  python-template:
+    name: Python template (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+    defaults:
+      run:
+        working-directory: .agents/skills/native-from-scratch/assets/python-http-service
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install --upgrade pip "setuptools>=83.0.0"
+      - run: python -m pip install --group dev
+      - run: ruff format --check .
+      - run: ruff check .
+      - run: mypy app.py test_app.py
+      - run: python -m unittest -v
+      - run: pip-audit --strict
+
+  ml-template:
+    name: ML baseline template (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.14"]
+    defaults:
+      run:
+        working-directory: .agents/skills/machine-learning/assets/baseline-classifier
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install -r requirements.txt -r ../../../../../tools/ci/requirements.txt
+      - run: pip-audit -r requirements.txt --strict
+      - run: ruff format --check .
+      - run: ruff check .
+      - run: python -m unittest -v
+      - run: python baseline.py
+
+  integration-kit:
+    name: API integration kit (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.14"]
+    defaults:
+      run:
+        working-directory: .agents/skills/api-integration/assets/python-integration-kit
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install --group dev
+      - run: ruff format --check .
+      - run: ruff check .
+      - run: mypy webhooks.py http_client.py test_integration_kit.py
+      - run: python -m unittest -v
+
+  chaos-kit:
+    name: Chaos experiment kit (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.14"]
+    defaults:
+      run:
+        working-directory: .agents/skills/chaos-engineering/assets/chaos-experiment-kit
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install --group dev
+      - run: ruff format --check .
+      - run: ruff check .
+      - run: mypy chaos.py fault_proxy.py example_experiment.py test_chaos_kit.py
+      - run: python -m unittest -v
+      - run: python example_experiment.py
+
+  mcp-toolbox-example:
+    name: MCP Toolbox example (real server over MCP stdio)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: .agents/skills/ai-agent-systems/assets/mcp-toolbox-sqlite
+    env:
+      TOOLBOX_VERSION: "1.14.0"
+      # SHA-256 of linux/amd64 v1.14.0 from https://github.com/googleapis/mcp-toolbox/releases/tag/v1.14.0
+      TOOLBOX_SHA256: 8ff7c6034d792e2754999e101116ac63b8a9fb926dd2f736065d8e0ef85ead22
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.14"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install --group dev
+      - run: ruff format --check .
+      - run: ruff check .
+      - run: mypy test_toolbox_smoke.py
+      - name: Download the pinned Toolbox binary and verify its checksum
+        run: |
+          curl -sSfL -o "$RUNNER_TEMP/toolbox" "https://storage.googleapis.com/mcp-toolbox-for-databases/v${TOOLBOX_VERSION}/linux/amd64/toolbox"
+          echo "${TOOLBOX_SHA256}  $RUNNER_TEMP/toolbox" | sha256sum -c
+          chmod +x "$RUNNER_TEMP/toolbox"
+      - run: TOOLBOX_BIN="$RUNNER_TEMP/toolbox" python -m unittest -v
+
+  clean-code:
+    name: Clean-code lint (complexity <= 10, nesting <= 3)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - run: npm ci --prefix tools/lint
+      - run: npm run --prefix tools/lint lint
+

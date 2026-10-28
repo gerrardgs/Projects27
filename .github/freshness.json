@@ -1,0 +1,61 @@
+[
+  {
+    "name": "gitleaks (CI secret scan; update the checksum too)",
+    "file": ".github/workflows/validate.yml",
+    "after": "GITLEAKS_VERSION: ",
+    "source": {
+      "type": "github",
+      "repo": "gitleaks/gitleaks"
+    }
+  },
+  {
+    "name": "mypy (Python template)",
+    "file": ".agents/skills/native-from-scratch/assets/python-http-service/pyproject.toml",
+    "after": "\"mypy==",
+    "until": "\"",
+    "source": {
+      "type": "pypi",
+      "package": "mypy"
+    }
+  },
+  {
+    "name": "ruff (Python template)",
+    "file": ".agents/skills/native-from-scratch/assets/python-http-service/pyproject.toml",
+    "after": "\"ruff==",
+    "until": "\"",
+    "source": {
+      "type": "pypi",
+      "package": "ruff"
+    }
+  },
+  {
+    "name": "pip-audit (Python template)",
+    "file": ".agents/skills/native-from-scratch/assets/python-http-service/pyproject.toml",
+    "after": "\"pip-audit==",
+    "until": "\"",
+    "source": {
+      "type": "pypi",
+      "package": "pip-audit"
+    }
+  },
+  {
+    "name": "Node.js versions tested in CI",
+    "file": ".github/workflows/validate.yml",
+    "after": "node-version: [",
+    "until": "]",
+    "source": {
+      "type": "endoflife",
+      "product": "nodejs"
+    }
+  },
+  {
+    "name": "Python versions tested in CI",
+    "file": ".github/workflows/validate.yml",
+    "after": "python-version: [",
+    "until": "]",
+    "source": {
+      "type": "endoflife",
+      "product": "python"
+    }
+  }
+]

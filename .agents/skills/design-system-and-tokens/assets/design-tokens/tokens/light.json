@@ -1,0 +1,50 @@
+{
+  "theme": {
+    "$type": "color",
+    "surface": {
+      "default": {
+        "$value": "{color.neutral.0}"
+      },
+      "subtle": {
+        "$value": "{color.neutral.50}"
+      }
+    },
+    "text": {
+      "default": {
+        "$value": "{color.neutral.900}"
+      },
+      "muted": {
+        "$value": "{color.neutral.600}"
+      },
+      "on-action": {
+        "$value": "{color.neutral.0}"
+      }
+    },
+    "action": {
+      "default": {
+        "$value": "{color.blue.600}"
+      },
+      "hover": {
+        "$value": "{color.blue.700}"
+      }
+    },
+    "border": {
+      "interactive": {
+        "$value": "{color.neutral.500}"
+      }
+    },
+    "focus": {
+      "ring": {
+        "$value": "{color.blue.600}"
+      }
+    },
+    "feedback": {
+      "danger": {
+        "$value": "{color.red.600}"
+      },
+      "success": {
+        "$value": "{color.green.700}"
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "description": "Pass thresholds, set on 2026-10-28 before the first evaluation run. Form gates apply to the held-out test split; ASR gates to the synthetic clean condition. Do not lower a gate to make a run pass.",
+  "form": {
+    "amount.accuracy": 0.95,
+    "amount.wrongFilledRate.max": 0.02,
+    "kind.accuracy": 0.95,
+    "date.accuracy": 0.95,
+    "accountCode.accuracy": 0.8,
+    "fundingCode.accuracy": 0.9,
+    "coreExactMatch": 0.7
+  },
+  "asr": {
+    "wer.max": 0.15,
+    "endToEnd.amount.accuracy": 0.9
+  }
+}

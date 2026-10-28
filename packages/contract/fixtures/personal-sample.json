@@ -1,0 +1,322 @@
+{
+  "description": "Shared sample ledger for the Projects 27 API, web, iOS and Android tests: a personal entity in IDR, September and October 2026. Expected values were computed independently with Python decimal arithmetic, not by the application code.",
+  "currency": "IDR",
+  "entityKind": "individual",
+  "entries": [
+    {
+      "type": "journal",
+      "date": "2026-09-01",
+      "description": "Saldo awal rekening bank",
+      "lines": [
+        {
+          "account": "1200",
+          "debit": "15000000.00"
+        },
+        {
+          "account": "3100",
+          "credit": "15000000.00"
+        }
+      ]
+    },
+    {
+      "type": "transaction",
+      "kind": "income",
+      "date": "2026-09-25",
+      "description": "Gaji September",
+      "account": "4100",
+      "funding": "1200",
+      "amount": "12000000.00"
+    },
+    {
+      "type": "transaction",
+      "kind": "transfer",
+      "date": "2026-09-25",
+      "description": "Tarik tunai",
+      "account": "1100",
+      "funding": "1200",
+      "amount": "2000000.00"
+    },
+    {
+      "type": "transaction",
+      "kind": "expense",
+      "date": "2026-09-27",
+      "description": "Makan bulan September",
+      "account": "5100",
+      "funding": "1100",
+      "amount": "850000.00"
+    },
+    {
+      "type": "transaction",
+      "kind": "expense",
+      "date": "2026-09-28",
+      "description": "Sewa kos September",
+      "account": "5300",
+      "funding": "1200",
+      "amount": "3500000.00"
+    },
+    {
+      "type": "transaction",
+      "kind": "expense",
+      "date": "2026-10-01",
+      "description": "Listrik, air dan internet",
+      "account": "5400",
+      "funding": "1200",
+      "amount": "725350.50"
+    },
+    {
+      "type": "transaction",
+      "kind": "transfer",
+      "date": "2026-10-02",
+      "description": "Isi saldo dompet digital",
+      "account": "1300",
+      "funding": "1200",
+      "amount": "1000000.00"
+    },
+    {
+      "type": "transaction",
+      "kind": "expense",
+      "date": "2026-10-03",
+      "description": "Belanja makan mingguan",
+      "account": "5100",
+      "funding": "1100",
+      "amount": "1135000.00"
+    },
+    {
+      "type": "transaction",
+      "kind": "expense",
+      "date": "2026-10-05",
+      "description": "Ojek dan KRL",
+      "account": "5200",
+      "funding": "1300",
+      "amount": "410000.00"
+    },
+    {
+      "type": "transaction",
+      "kind": "expense",
+      "date": "2026-10-10",
+      "description": "Langganan streaming dan bioskop",
+      "account": "5800",
+      "funding": "2100",
+      "amount": "186000.00"
+    },
+    {
+      "type": "transaction",
+      "kind": "income",
+      "date": "2026-10-15",
+      "description": "Proyek freelance desain",
+      "account": "4300",
+      "funding": "1200",
+      "amount": "4250000.00"
+    },
+    {
+      "type": "transaction",
+      "kind": "income",
+      "date": "2026-10-25",
+      "description": "Gaji Oktober",
+      "account": "4100",
+      "funding": "1200",
+      "amount": "12000000.00"
+    },
+    {
+      "type": "transaction",
+      "kind": "expense",
+      "date": "2026-10-26",
+      "description": "Sewa kos Oktober",
+      "account": "5300",
+      "funding": "1200",
+      "amount": "3500000.00"
+    },
+    {
+      "type": "transaction",
+      "kind": "expense",
+      "date": "2026-10-28",
+      "description": "Donasi",
+      "account": "5910",
+      "funding": "1200",
+      "amount": "250000.00"
+    }
+  ],
+  "expected": {
+    "monthlyRecap": {
+      "year": 2026,
+      "month": 10,
+      "totalIncome": "16250000.00",
+      "totalExpenses": "6206350.50",
+      "net": "10043649.50",
+      "savingsRate": "61.80",
+      "income": [
+        {
+          "code": "4100",
+          "month": "12000000.00",
+          "previousMonth": "12000000.00",
+          "change": "0.00",
+          "yearToDate": "24000000.00",
+          "shareOfTotal": "73.84"
+        },
+        {
+          "code": "4300",
+          "month": "4250000.00",
+          "previousMonth": "0.00",
+          "change": "4250000.00",
+          "yearToDate": "4250000.00",
+          "shareOfTotal": "26.15"
+        }
+      ],
+      "expenses": [
+        {
+          "code": "5100",
+          "month": "1135000.00",
+          "previousMonth": "850000.00",
+          "change": "285000.00",
+          "yearToDate": "1985000.00",
+          "shareOfTotal": "18.28"
+        },
+        {
+          "code": "5200",
+          "month": "410000.00",
+          "previousMonth": "0.00",
+          "change": "410000.00",
+          "yearToDate": "410000.00",
+          "shareOfTotal": "6.60"
+        },
+        {
+          "code": "5300",
+          "month": "3500000.00",
+          "previousMonth": "3500000.00",
+          "change": "0.00",
+          "yearToDate": "7000000.00",
+          "shareOfTotal": "56.39"
+        },
+        {
+          "code": "5400",
+          "month": "725350.50",
+          "previousMonth": "0.00",
+          "change": "725350.50",
+          "yearToDate": "725350.50",
+          "shareOfTotal": "11.68"
+        },
+        {
+          "code": "5800",
+          "month": "186000.00",
+          "previousMonth": "0.00",
+          "change": "186000.00",
+          "yearToDate": "186000.00",
+          "shareOfTotal": "2.99"
+        },
+        {
+          "code": "5910",
+          "month": "250000.00",
+          "previousMonth": "0.00",
+          "change": "250000.00",
+          "yearToDate": "250000.00",
+          "shareOfTotal": "4.02"
+        }
+      ]
+    },
+    "balanceSheet": {
+      "asOf": "2026-10-31",
+      "assets": [
+        {
+          "code": "1100",
+          "amount": "15000.00"
+        },
+        {
+          "code": "1200",
+          "amount": "32274649.50"
+        },
+        {
+          "code": "1300",
+          "amount": "590000.00"
+        }
+      ],
+      "liabilities": [
+        {
+          "code": "2100",
+          "amount": "186000.00"
+        }
+      ],
+      "equity": [
+        {
+          "code": "3100",
+          "amount": "15000000.00"
+        }
+      ],
+      "accumulatedEarnings": "17693649.50",
+      "totalAssets": "32879649.50",
+      "totalLiabilities": "186000.00",
+      "totalEquity": "32693649.50"
+    },
+    "trialBalance": {
+      "asOf": "2026-10-31",
+      "totalDebit": "43436000.00",
+      "totalCredit": "43436000.00",
+      "lines": [
+        {
+          "code": "1100",
+          "debit": "15000.00",
+          "credit": "0.00"
+        },
+        {
+          "code": "1200",
+          "debit": "32274649.50",
+          "credit": "0.00"
+        },
+        {
+          "code": "1300",
+          "debit": "590000.00",
+          "credit": "0.00"
+        },
+        {
+          "code": "2100",
+          "debit": "0.00",
+          "credit": "186000.00"
+        },
+        {
+          "code": "3100",
+          "debit": "0.00",
+          "credit": "15000000.00"
+        },
+        {
+          "code": "4100",
+          "debit": "0.00",
+          "credit": "24000000.00"
+        },
+        {
+          "code": "4300",
+          "debit": "0.00",
+          "credit": "4250000.00"
+        },
+        {
+          "code": "5100",
+          "debit": "1985000.00",
+          "credit": "0.00"
+        },
+        {
+          "code": "5200",
+          "debit": "410000.00",
+          "credit": "0.00"
+        },
+        {
+          "code": "5300",
+          "debit": "7000000.00",
+          "credit": "0.00"
+        },
+        {
+          "code": "5400",
+          "debit": "725350.50",
+          "credit": "0.00"
+        },
+        {
+          "code": "5800",
+          "debit": "186000.00",
+          "credit": "0.00"
+        },
+        {
+          "code": "5910",
+          "debit": "250000.00",
+          "credit": "0.00"
+        }
+      ]
+    }
+  }
+}

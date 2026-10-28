@@ -1,0 +1,59 @@
+name: Release
+
+# Publishes a GitHub release from the hand-written notes in .github/releases/<tag>.md:
+# - automatically when a version tag (vX.Y.Z) is pushed, or
+# - on demand for a tag that already exists (Actions > Release > Run workflow), for example to publish older tags.
+# The first line of the notes file ("# vX.Y.Z - Title") becomes the release title; the rest is the body.
+# Running it again for the same tag updates that release instead of creating a second one.
+
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to publish, for example v1.6.0"
+        required: true
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: release-${{ github.ref }}-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish release notes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write # create or edit the release
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0 # all tags, to decide which release is the latest
+      - name: Create or update the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          if ! [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::'$TAG' is not a version tag like v1.2.3"
+            exit 1
+          fi
+          git rev-parse --quiet --verify "refs/tags/$TAG" >/dev/null || { echo "::error::tag $TAG does not exist"; exit 1; }
+          notes_file=".github/releases/$TAG.md"
+          [ -f "$notes_file" ] || { echo "::error::missing $notes_file"; exit 1; }
+          title="$(head -n 1 "$notes_file" | sed 's/^# //')"
+          tail -n +2 "$notes_file" > "$RUNNER_TEMP/notes.md"
+          newest="$(git tag --list 'v*.*.*' --sort=-version:refname | head -n 1)"
+          latest="false"
+          [ "$TAG" = "$newest" ] && latest="true"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --title "$title" --notes-file "$RUNNER_TEMP/notes.md" --latest="$latest"
+          else
+            gh release create "$TAG" --verify-tag --title "$title" --notes-file "$RUNNER_TEMP/notes.md" --latest="$latest"
+          fi
+          echo "Published $TAG (latest: $latest)" >> "$GITHUB_STEP_SUMMARY"

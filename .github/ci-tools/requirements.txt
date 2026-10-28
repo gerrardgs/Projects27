@@ -1,0 +1,6 @@
+# Lint and audit tools installed by the "spec" job in .github/workflows/validate.yml.
+# Dependabot (pip ecosystem) proposes updates; keep exact pins.
+actionlint-py==1.7.12.25
+pyyaml==6.0.3
+shellcheck-py==0.11.0.1
+zizmor==1.31.1

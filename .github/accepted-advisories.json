@@ -1,0 +1,9 @@
+[
+  {
+    "id": "GHSA-vfj7-8cjw-p6xm",
+    "package": "braces",
+    "directories": [".agents/skills/frontend-from-scratch/assets/static-site"],
+    "expires": "2026-11-30",
+    "reason": "No patched release exists; reached only through Stylelint (a development tool) with a fixed input path. See SECURITY.md, Accepted risk. Re-review by the expiry date or as soon as a fix is published."
+  }
+]

@@ -1,0 +1,1567 @@
+{
+ "description": "Indonesian capture sentences with expected form values. Labelled by the developer with the guide in docs/EVALUATION.md before any parser tuning; 'dev' cases may be used to improve the parser, 'test' cases never.",
+ "today": "2026-10-28",
+ "timeZone": "Asia/Jakarta",
+ "cases": [
+  {
+   "id": "d01",
+   "text": "beli nasi padang 35 ribu pakai gopay kemarin",
+   "expect": {
+    "kind": "expense",
+    "amount": "35000.00",
+    "date": "2026-10-27",
+    "accountCode": "5100",
+    "fundingCode": "1300",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d02",
+   "text": "Saya beli barang buat modif motor 400.000 pakai internet banking Danamon",
+   "expect": {
+    "kind": "expense",
+    "amount": "400000.00",
+    "date": "2026-10-28",
+    "accountCode": "5200",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d03",
+   "text": "bayar listrik 250 ribu pakai bca kemarin",
+   "expect": {
+    "kind": "expense",
+    "amount": "250000.00",
+    "date": "2026-10-27",
+    "accountCode": "5400",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d04",
+   "text": "terima gaji 12,5 juta dari PT Maju Jaya",
+   "expect": {
+    "kind": "income",
+    "amount": "12500000.00",
+    "date": "2026-10-28",
+    "accountCode": "4100",
+    "fundingCode": "1200",
+    "counterparty": "PT Maju Jaya"
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d05",
+   "text": "isi bensin pertalite 50rb tunai",
+   "expect": {
+    "kind": "expense",
+    "amount": "50000.00",
+    "date": "2026-10-28",
+    "accountCode": "5200",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d06",
+   "text": "ngopi di Kopi Kenangan 28 ribu pakai ovo",
+   "expect": {
+    "kind": "expense",
+    "amount": "28000.00",
+    "date": "2026-10-28",
+    "accountCode": "5100",
+    "fundingCode": "1300",
+    "counterparty": "Kopi Kenangan"
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d07",
+   "text": "bayar kos bulan ini 1,5 juta transfer mandiri",
+   "expect": {
+    "kind": "expense",
+    "amount": "1500000.00",
+    "date": "2026-10-28",
+    "accountCode": "5300",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d08",
+   "text": "top up gopay 200 ribu dari bca",
+   "expect": {
+    "kind": "transfer",
+    "amount": "200000.00",
+    "date": "2026-10-28",
+    "accountCode": "1300",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d09",
+   "text": "tarik tunai 500 ribu di atm",
+   "expect": {
+    "kind": "transfer",
+    "amount": "500000.00",
+    "date": "2026-10-28",
+    "accountCode": "1100",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d10",
+   "text": "dapat bonus 2 juta",
+   "expect": {
+    "kind": "income",
+    "amount": "2000000.00",
+    "date": "2026-10-28",
+    "accountCode": "4200",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d11",
+   "text": "beli obat di apotek kimia farma 75 ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "75000.00",
+    "date": "2026-10-28",
+    "accountCode": "5500",
+    "fundingCode": "1100",
+    "counterparty": "Apotek Kimia Farma"
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d12",
+   "text": "bayar netflix 186 ribu pakai kartu kredit",
+   "expect": {
+    "kind": "expense",
+    "amount": "186000.00",
+    "date": "2026-10-28",
+    "accountCode": "5800",
+    "fundingCode": "2100",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d13",
+   "text": "zakat 2,5 juta lewat bsi",
+   "expect": {
+    "kind": "expense",
+    "amount": "2500000.00",
+    "date": "2026-10-28",
+    "accountCode": "5910",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d14",
+   "text": "beli pulsa 100 ribu pakai dana",
+   "expect": {
+    "kind": "expense",
+    "amount": "100000.00",
+    "date": "2026-10-28",
+    "accountCode": "5400",
+    "fundingCode": "1300",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d15",
+   "text": "naik grab ke kantor 32 ribu pakai ovo tadi pagi",
+   "expect": {
+    "kind": "expense",
+    "amount": "32000.00",
+    "date": "2026-10-28",
+    "accountCode": "5200",
+    "fundingCode": "1300",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d16",
+   "text": "belanja bulanan di indomaret 450 ribu pakai debit bca",
+   "expect": {
+    "kind": "expense",
+    "amount": "450000.00",
+    "date": "2026-10-28",
+    "accountCode": "5700",
+    "fundingCode": "1200",
+    "counterparty": "Indomaret"
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d17",
+   "text": "terima transferan hasil jualan 750 ribu",
+   "expect": {
+    "kind": "income",
+    "amount": "750000.00",
+    "date": "2026-10-28",
+    "accountCode": "4300",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d18",
+   "text": "bayar spp anak 1,2 juta transfer bni",
+   "expect": {
+    "kind": "expense",
+    "amount": "1200000.00",
+    "date": "2026-10-28",
+    "accountCode": "5600",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d19",
+   "text": "makan siang 45.000 cash",
+   "expect": {
+    "kind": "expense",
+    "amount": "45000.00",
+    "date": "2026-10-28",
+    "accountCode": "5100",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d20",
+   "text": "beli sabun dan sampo 60 ribu di alfamart",
+   "expect": {
+    "kind": "expense",
+    "amount": "60000.00",
+    "date": "2026-10-28",
+    "accountCode": "5700",
+    "fundingCode": "1100",
+    "counterparty": "Alfamart"
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d21",
+   "text": "bayar tagihan kartu kredit 3 juta dari bca",
+   "expect": {
+    "kind": "transfer",
+    "amount": "3000000.00",
+    "date": "2026-10-28",
+    "accountCode": "2100",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d22",
+   "text": "bunga deposito masuk 125 ribu",
+   "expect": {
+    "kind": "income",
+    "amount": "125000.00",
+    "date": "2026-10-28",
+    "accountCode": "4400",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d23",
+   "text": "parkir 5 ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "5000.00",
+    "date": "2026-10-28",
+    "accountCode": "5200",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d24",
+   "text": "bayar wifi indihome 385 ribu kemarin lusa pakai mandiri",
+   "expect": {
+    "kind": "expense",
+    "amount": "385000.00",
+    "date": "2026-10-26",
+    "accountCode": "5400",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d25",
+   "text": "beli buku kuliah 150 ribu tanggal 20",
+   "expect": {
+    "kind": "expense",
+    "amount": "150000.00",
+    "date": "2026-10-20",
+    "accountCode": "5600",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d26",
+   "text": "sedekah jumat 50 ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "50000.00",
+    "date": "2026-10-28",
+    "accountCode": "5910",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d27",
+   "text": "biaya admin bank 6.500",
+   "expect": {
+    "kind": "expense",
+    "amount": "6500.00",
+    "date": "2026-10-28",
+    "accountCode": "5950",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d28",
+   "text": "terima honor ngajar 1 juta dari Universitas Indonesia",
+   "expect": {
+    "kind": "income",
+    "amount": "1000000.00",
+    "date": "2026-10-28",
+    "accountCode": "4300",
+    "fundingCode": "1200",
+    "counterparty": "Universitas Indonesia"
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d29",
+   "text": "beli kopi 18 ribu 3 hari lalu",
+   "expect": {
+    "kind": "expense",
+    "amount": "18000.00",
+    "date": "2026-10-25",
+    "accountCode": "5100",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d30",
+   "text": "servis motor di bengkel 275 ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "275000.00",
+    "date": "2026-10-28",
+    "accountCode": "5200",
+    "fundingCode": "1100",
+    "counterparty": "Bengkel"
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d31",
+   "text": "bayar bpjs kesehatan 150 ribu pakai bri",
+   "expect": {
+    "kind": "expense",
+    "amount": "150000.00",
+    "date": "2026-10-28",
+    "accountCode": "5500",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d32",
+   "text": "nonton bioskop 100 ribu pakai shopeepay",
+   "expect": {
+    "kind": "expense",
+    "amount": "100000.00",
+    "date": "2026-10-28",
+    "accountCode": "5800",
+    "fundingCode": "1300",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d33",
+   "text": "beli beras 5 kilo 75 ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "75000.00",
+    "date": "2026-10-28",
+    "accountCode": "5700",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d34",
+   "text": "gajian 8 juta",
+   "expect": {
+    "kind": "income",
+    "amount": "8000000.00",
+    "date": "2026-10-28",
+    "accountCode": "4100",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d35",
+   "text": "setor tunai 1 juta ke rekening",
+   "expect": {
+    "kind": "transfer",
+    "amount": "1000000.00",
+    "date": "2026-10-28",
+    "accountCode": "1200",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d36",
+   "text": "bayar pajak kendaraan 450 ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "450000.00",
+    "date": "2026-10-28",
+    "accountCode": "5900",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d37",
+   "text": "beli tiket kereta ke bandung 150 ribu pakai bca",
+   "expect": {
+    "kind": "expense",
+    "amount": "150000.00",
+    "date": "2026-10-28",
+    "accountCode": "5200",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d38",
+   "text": "dikasih uang 500 ribu dari ibu",
+   "expect": {
+    "kind": "income",
+    "amount": "500000.00",
+    "date": "2026-10-28",
+    "accountCode": "4900",
+    "fundingCode": "1200",
+    "counterparty": "Ibu"
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d39",
+   "text": "makan malam di restoran sederhana 230 ribu pakai kartu kredit",
+   "expect": {
+    "kind": "expense",
+    "amount": "230000.00",
+    "date": "2026-10-28",
+    "accountCode": "5100",
+    "fundingCode": "2100",
+    "counterparty": "Restoran Sederhana"
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d40",
+   "text": "bayar air pdam 95 ribu tanggal 5",
+   "expect": {
+    "kind": "expense",
+    "amount": "95000.00",
+    "date": "2026-10-05",
+    "accountCode": "5400",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d41",
+   "text": "beli galon 20 ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "20000.00",
+    "date": "2026-10-28",
+    "accountCode": "5700",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d42",
+   "text": "langganan spotify 55 ribu pakai gopay",
+   "expect": {
+    "kind": "expense",
+    "amount": "55000.00",
+    "date": "2026-10-28",
+    "accountCode": "5800",
+    "fundingCode": "1300",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d43",
+   "text": "dividen saham 340 ribu masuk ke rdn",
+   "expect": {
+    "kind": "income",
+    "amount": "340000.00",
+    "date": "2026-10-28",
+    "accountCode": "4400",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d44",
+   "text": "beli bakso 25 ribu kemarin",
+   "expect": {
+    "kind": "expense",
+    "amount": "25000.00",
+    "date": "2026-10-27",
+    "accountCode": "5100",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d45",
+   "text": "bayar kontrakan 2 juta 500 ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "2500000.00",
+    "date": "2026-10-28",
+    "accountCode": "5300",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d46",
+   "text": "dua puluh lima ribu beli jajan",
+   "expect": {
+    "kind": "expense",
+    "amount": "25000.00",
+    "date": "2026-10-28",
+    "accountCode": "5100",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d47",
+   "text": "terima thr 5 juta",
+   "expect": {
+    "kind": "income",
+    "amount": "5000000.00",
+    "date": "2026-10-28",
+    "accountCode": "4200",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d48",
+   "text": "bayar ojol 15 ribu pakai gopay",
+   "expect": {
+    "kind": "expense",
+    "amount": "15000.00",
+    "date": "2026-10-28",
+    "accountCode": "5200",
+    "fundingCode": "1300",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d49",
+   "text": "beli vitamin 120 ribu di apotek",
+   "expect": {
+    "kind": "expense",
+    "amount": "120000.00",
+    "date": "2026-10-28",
+    "accountCode": "5500",
+    "fundingCode": "1100",
+    "counterparty": "Apotek"
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d50",
+   "text": "bayar les bahasa inggris 600 ribu pakai bni",
+   "expect": {
+    "kind": "expense",
+    "amount": "600000.00",
+    "date": "2026-10-28",
+    "accountCode": "5600",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d51",
+   "text": "beli baju 350 ribu pakai kartu kredit",
+   "expect": {
+    "kind": "expense",
+    "amount": "350000.00",
+    "date": "2026-10-28",
+    "accountCode": "5700",
+    "fundingCode": "2100",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d52",
+   "text": "top up ovo 100 ribu dari mandiri",
+   "expect": {
+    "kind": "transfer",
+    "amount": "100000.00",
+    "date": "2026-10-28",
+    "accountCode": "1300",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d53",
+   "text": "potong rambut 50 ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "50000.00",
+    "date": "2026-10-28",
+    "accountCode": "5990",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d54",
+   "text": "dapat cashback 25 ribu di gopay",
+   "expect": {
+    "kind": "income",
+    "amount": "25000.00",
+    "date": "2026-10-28",
+    "accountCode": "4900",
+    "fundingCode": "1300",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d55",
+   "text": "bayar token listrik 200 ribu tanggal 1 oktober",
+   "expect": {
+    "kind": "expense",
+    "amount": "200000.00",
+    "date": "2026-10-01",
+    "accountCode": "5400",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d56",
+   "text": "kirim uang ke adik 300 ribu lewat bca",
+   "expect": {
+    "kind": "expense",
+    "amount": "300000.00",
+    "date": "2026-10-28",
+    "accountCode": "5990",
+    "fundingCode": "1200",
+    "counterparty": "Adik"
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d57",
+   "text": "beli makan kucing 85 ribu di petshop",
+   "expect": {
+    "kind": "expense",
+    "amount": "85000.00",
+    "date": "2026-10-28",
+    "accountCode": "5700",
+    "fundingCode": "1100",
+    "counterparty": "Petshop"
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d58",
+   "text": "bayar uang kuliah 4 juta pakai bca",
+   "expect": {
+    "kind": "expense",
+    "amount": "4000000.00",
+    "date": "2026-10-28",
+    "accountCode": "5600",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d59",
+   "text": "terima pembayaran proyek desain 3,5 juta dari CV Kreatif",
+   "expect": {
+    "kind": "income",
+    "amount": "3500000.00",
+    "date": "2026-10-28",
+    "accountCode": "4300",
+    "fundingCode": "1200",
+    "counterparty": "CV Kreatif"
+   },
+   "split": "dev"
+  },
+  {
+   "id": "d60",
+   "text": "beli martabak 40rb pake dana",
+   "expect": {
+    "kind": "expense",
+    "amount": "40000.00",
+    "date": "2026-10-28",
+    "accountCode": "5100",
+    "fundingCode": "1300",
+    "counterparty": null
+   },
+   "split": "dev"
+  },
+  {
+   "id": "t01",
+   "text": "tadi beli es kopi susu 22 ribu pakai gopay",
+   "expect": {
+    "kind": "expense",
+    "amount": "22000.00",
+    "date": "2026-10-28",
+    "accountCode": "5100",
+    "fundingCode": "1300",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t02",
+   "text": "kemarin isi bensin pertamax 150 ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "150000.00",
+    "date": "2026-10-27",
+    "accountCode": "5200",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t03",
+   "text": "bayar internet bulan oktober 330 ribu lewat bca",
+   "expect": {
+    "kind": "expense",
+    "amount": "330000.00",
+    "date": "2026-10-28",
+    "accountCode": "5400",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t04",
+   "text": "gaji bulan ini masuk 9,75 juta",
+   "expect": {
+    "kind": "income",
+    "amount": "9750000.00",
+    "date": "2026-10-28",
+    "accountCode": "4100",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t05",
+   "text": "beli sayur di pasar 47.500",
+   "expect": {
+    "kind": "expense",
+    "amount": "47500.00",
+    "date": "2026-10-28",
+    "accountCode": "5700",
+    "fundingCode": "1100",
+    "counterparty": "Pasar"
+   },
+   "split": "test"
+  },
+  {
+   "id": "t06",
+   "text": "Rp 125.000 untuk makan malam keluarga",
+   "expect": {
+    "kind": "expense",
+    "amount": "125000.00",
+    "date": "2026-10-28",
+    "accountCode": "5100",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t07",
+   "text": "bayar parkir mall 10 ribu tunai",
+   "expect": {
+    "kind": "expense",
+    "amount": "10000.00",
+    "date": "2026-10-28",
+    "accountCode": "5200",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t08",
+   "text": "transfer ke gopay 150 ribu dari rekening bni",
+   "expect": {
+    "kind": "transfer",
+    "amount": "150000.00",
+    "date": "2026-10-28",
+    "accountCode": "1300",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t09",
+   "text": "tarik tunai 1 juta",
+   "expect": {
+    "kind": "transfer",
+    "amount": "1000000.00",
+    "date": "2026-10-28",
+    "accountCode": "1100",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t10",
+   "text": "dapat komisi penjualan 1,25 juta",
+   "expect": {
+    "kind": "income",
+    "amount": "1250000.00",
+    "date": "2026-10-28",
+    "accountCode": "4300",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t11",
+   "text": "beli paket data 75 ribu pakai shopeepay kemarin",
+   "expect": {
+    "kind": "expense",
+    "amount": "75000.00",
+    "date": "2026-10-27",
+    "accountCode": "5400",
+    "fundingCode": "1300",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t12",
+   "text": "bayar dokter gigi 400 ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "400000.00",
+    "date": "2026-10-28",
+    "accountCode": "5500",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t13",
+   "text": "infaq masjid 20 ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "20000.00",
+    "date": "2026-10-28",
+    "accountCode": "5910",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t14",
+   "text": "langganan youtube premium 59 ribu pakai kartu kredit",
+   "expect": {
+    "kind": "expense",
+    "amount": "59000.00",
+    "date": "2026-10-28",
+    "accountCode": "5800",
+    "fundingCode": "2100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t15",
+   "text": "makan di warteg 18 ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "18000.00",
+    "date": "2026-10-28",
+    "accountCode": "5100",
+    "fundingCode": "1100",
+    "counterparty": "Warteg"
+   },
+   "split": "test"
+  },
+  {
+   "id": "t16",
+   "text": "beli tiket pesawat ke bali 1,8 juta pakai bca",
+   "expect": {
+    "kind": "expense",
+    "amount": "1800000.00",
+    "date": "2026-10-28",
+    "accountCode": "5200",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t17",
+   "text": "terima bunga tabungan 12.345",
+   "expect": {
+    "kind": "income",
+    "amount": "12345.00",
+    "date": "2026-10-28",
+    "accountCode": "4400",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t18",
+   "text": "bayar sewa apartemen 4,5 juta tanggal 1",
+   "expect": {
+    "kind": "expense",
+    "amount": "4500000.00",
+    "date": "2026-10-01",
+    "accountCode": "5300",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t19",
+   "text": "beli token listrik dua ratus ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "200000.00",
+    "date": "2026-10-28",
+    "accountCode": "5400",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t20",
+   "text": "beli kado ulang tahun 250 ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "250000.00",
+    "date": "2026-10-28",
+    "accountCode": "5990",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t21",
+   "text": "naik transjakarta 3.500",
+   "expect": {
+    "kind": "expense",
+    "amount": "3500.00",
+    "date": "2026-10-28",
+    "accountCode": "5200",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t22",
+   "text": "bayar tagihan kartu kredit bni 2,3 juta pakai mandiri",
+   "expect": {
+    "kind": "transfer",
+    "amount": "2300000.00",
+    "date": "2026-10-28",
+    "accountCode": "2100",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t23",
+   "text": "pemasukan freelance 2 juta dari Tokopedia",
+   "expect": {
+    "kind": "income",
+    "amount": "2000000.00",
+    "date": "2026-10-28",
+    "accountCode": "4300",
+    "fundingCode": "1200",
+    "counterparty": "Tokopedia"
+   },
+   "split": "test"
+  },
+  {
+   "id": "t24",
+   "text": "beli sembako 320 ribu di alfamart pakai debit",
+   "expect": {
+    "kind": "expense",
+    "amount": "320000.00",
+    "date": "2026-10-28",
+    "accountCode": "5700",
+    "fundingCode": "1200",
+    "counterparty": "Alfamart"
+   },
+   "split": "test"
+  },
+  {
+   "id": "t25",
+   "text": "bayar pbb 780 ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "780000.00",
+    "date": "2026-10-28",
+    "accountCode": "5900",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t26",
+   "text": "sumbangan bencana 100 ribu lewat dana",
+   "expect": {
+    "kind": "expense",
+    "amount": "100000.00",
+    "date": "2026-10-28",
+    "accountCode": "5910",
+    "fundingCode": "1300",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t27",
+   "text": "beli nasi goreng 20 ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "20000.00",
+    "date": "2026-10-28",
+    "accountCode": "5100",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t28",
+   "text": "biaya transfer antar bank 6.500",
+   "expect": {
+    "kind": "expense",
+    "amount": "6500.00",
+    "date": "2026-10-28",
+    "accountCode": "5950",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t29",
+   "text": "kuliah semester ini 7,5 juta bayar pakai bri",
+   "expect": {
+    "kind": "expense",
+    "amount": "7500000.00",
+    "date": "2026-10-28",
+    "accountCode": "5600",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t30",
+   "text": "beli obat flu 35rb di indomaret",
+   "expect": {
+    "kind": "expense",
+    "amount": "35000.00",
+    "date": "2026-10-28",
+    "accountCode": "5500",
+    "fundingCode": "1100",
+    "counterparty": "Indomaret"
+   },
+   "split": "test"
+  },
+  {
+   "id": "t31",
+   "text": "uang saku dari ayah 1 juta",
+   "expect": {
+    "kind": "income",
+    "amount": "1000000.00",
+    "date": "2026-10-28",
+    "accountCode": "4900",
+    "fundingCode": "1200",
+    "counterparty": "Ayah"
+   },
+   "split": "test"
+  },
+  {
+   "id": "t32",
+   "text": "setor tunai ke bca 2 juta",
+   "expect": {
+    "kind": "transfer",
+    "amount": "2000000.00",
+    "date": "2026-10-28",
+    "accountCode": "1200",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t33",
+   "text": "top up shopeepay 50 ribu pakai bri",
+   "expect": {
+    "kind": "transfer",
+    "amount": "50000.00",
+    "date": "2026-10-28",
+    "accountCode": "1300",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t34",
+   "text": "beli kuota internet 50 ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "50000.00",
+    "date": "2026-10-28",
+    "accountCode": "5400",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t35",
+   "text": "bayar ojek online 23 ribu pakai gopay",
+   "expect": {
+    "kind": "expense",
+    "amount": "23000.00",
+    "date": "2026-10-28",
+    "accountCode": "5200",
+    "fundingCode": "1300",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t36",
+   "text": "beli kacamata 650 ribu di optik",
+   "expect": {
+    "kind": "expense",
+    "amount": "650000.00",
+    "date": "2026-10-28",
+    "accountCode": "5500",
+    "fundingCode": "1100",
+    "counterparty": "Optik"
+   },
+   "split": "test"
+  },
+  {
+   "id": "t37",
+   "text": "makan siang bareng tim 300 ribu pakai kartu kredit kemarin",
+   "expect": {
+    "kind": "expense",
+    "amount": "300000.00",
+    "date": "2026-10-27",
+    "accountCode": "5100",
+    "fundingCode": "2100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t38",
+   "text": "terima dividen reksadana 210 ribu",
+   "expect": {
+    "kind": "income",
+    "amount": "210000.00",
+    "date": "2026-10-28",
+    "accountCode": "4400",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t39",
+   "text": "bayar asuransi kesehatan 450 ribu pakai bca",
+   "expect": {
+    "kind": "expense",
+    "amount": "450000.00",
+    "date": "2026-10-28",
+    "accountCode": "5500",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t40",
+   "text": "beli gas elpiji 22 ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "22000.00",
+    "date": "2026-10-28",
+    "accountCode": "5700",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t41",
+   "text": "jual barang bekas dapat 300 ribu",
+   "expect": {
+    "kind": "income",
+    "amount": "300000.00",
+    "date": "2026-10-28",
+    "accountCode": "4300",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t42",
+   "text": "bayar cicilan rumah 3,2 juta autodebet mandiri",
+   "expect": {
+    "kind": "expense",
+    "amount": "3200000.00",
+    "date": "2026-10-28",
+    "accountCode": "5300",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t43",
+   "text": "beli game di steam 150 ribu pakai kartu kredit",
+   "expect": {
+    "kind": "expense",
+    "amount": "150000.00",
+    "date": "2026-10-28",
+    "accountCode": "5800",
+    "fundingCode": "2100",
+    "counterparty": "Steam"
+   },
+   "split": "test"
+  },
+  {
+   "id": "t44",
+   "text": "bayar laundry 40 ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "40000.00",
+    "date": "2026-10-28",
+    "accountCode": "5990",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t45",
+   "text": "pengeluaran 1.250.000 untuk servis mobil",
+   "expect": {
+    "kind": "expense",
+    "amount": "1250000.00",
+    "date": "2026-10-28",
+    "accountCode": "5200",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t46",
+   "text": "ngopi 30 ribu 2 hari lalu pakai ovo",
+   "expect": {
+    "kind": "expense",
+    "amount": "30000.00",
+    "date": "2026-10-26",
+    "accountCode": "5100",
+    "fundingCode": "1300",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t47",
+   "text": "terima refund tiket 450 ribu ke bca",
+   "expect": {
+    "kind": "income",
+    "amount": "450000.00",
+    "date": "2026-10-28",
+    "accountCode": "4900",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t48",
+   "text": "beli tiket konser 1,5 juta",
+   "expect": {
+    "kind": "expense",
+    "amount": "1500000.00",
+    "date": "2026-10-28",
+    "accountCode": "5800",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t49",
+   "text": "bayar sekolah anak lima ratus ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "500000.00",
+    "date": "2026-10-28",
+    "accountCode": "5600",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t50",
+   "text": "belanja di supermarket 275.300 pakai debit mandiri",
+   "expect": {
+    "kind": "expense",
+    "amount": "275300.00",
+    "date": "2026-10-28",
+    "accountCode": "5700",
+    "fundingCode": "1200",
+    "counterparty": "Supermarket"
+   },
+   "split": "test"
+  },
+  {
+   "id": "t51",
+   "text": "bayar zakat fitrah 45 ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "45000.00",
+    "date": "2026-10-28",
+    "accountCode": "5910",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t52",
+   "text": "terima uang sewa kos 1,2 juta",
+   "expect": {
+    "kind": "income",
+    "amount": "1200000.00",
+    "date": "2026-10-28",
+    "accountCode": "4900",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t53",
+   "text": "bayar air galon dan gas 50 ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "50000.00",
+    "date": "2026-10-28",
+    "accountCode": "5700",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t54",
+   "text": "beli seblak 15 ribu pake gopay",
+   "expect": {
+    "kind": "expense",
+    "amount": "15000.00",
+    "date": "2026-10-28",
+    "accountCode": "5100",
+    "fundingCode": "1300",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t55",
+   "text": "honor pembicara seminar 2,5 juta dari Kampus ITB",
+   "expect": {
+    "kind": "income",
+    "amount": "2500000.00",
+    "date": "2026-10-28",
+    "accountCode": "4300",
+    "fundingCode": "1200",
+    "counterparty": "Kampus ITB"
+   },
+   "split": "test"
+  },
+  {
+   "id": "t56",
+   "text": "bayar listrik 1 juta 250 ribu",
+   "expect": {
+    "kind": "expense",
+    "amount": "1250000.00",
+    "date": "2026-10-28",
+    "accountCode": "5400",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t57",
+   "text": "beli pertalite 30.000 pakai qris gopay",
+   "expect": {
+    "kind": "expense",
+    "amount": "30000.00",
+    "date": "2026-10-28",
+    "accountCode": "5200",
+    "fundingCode": "1300",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t58",
+   "text": "transfer ke ovo 75 ribu dari bri",
+   "expect": {
+    "kind": "transfer",
+    "amount": "75000.00",
+    "date": "2026-10-28",
+    "accountCode": "1300",
+    "fundingCode": "1200",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t59",
+   "text": "bayar uang kos 900 ribu tanggal 3 oktober",
+   "expect": {
+    "kind": "expense",
+    "amount": "900000.00",
+    "date": "2026-10-03",
+    "accountCode": "5300",
+    "fundingCode": "1100",
+    "counterparty": null
+   },
+   "split": "test"
+  },
+  {
+   "id": "t60",
+   "text": "beli sate 60 ribu di Sate Khas Senayan pakai kartu kredit",
+   "expect": {
+    "kind": "expense",
+    "amount": "60000.00",
+    "date": "2026-10-28",
+    "accountCode": "5100",
+    "fundingCode": "2100",
+    "counterparty": "Sate Khas Senayan"
+   },
+   "split": "test"
+  }
+ ]
+}

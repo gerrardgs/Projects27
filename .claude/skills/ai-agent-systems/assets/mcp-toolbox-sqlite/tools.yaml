@@ -1,0 +1,45 @@
+# MCP Toolbox for Databases (https://github.com/googleapis/mcp-toolbox), tested with v1.14.0.
+# Read-only tools over a SQLite catalog. The agent can call only these fixed, parameterized
+# statements; it cannot run arbitrary SQL. The database path comes from the environment.
+kind: source
+name: catalog-db
+type: sqlite
+database: ${CATALOG_DB}
+---
+kind: tool
+name: list-products-by-category
+type: sqlite-sql
+source: catalog-db
+description: List products in one category, cheapest first. Returns sku, name and price_cents.
+parameters:
+  - name: category
+    type: string
+    description: Exact category name, for example "books" or "garden".
+statement: SELECT sku, name, price_cents FROM products WHERE category = ? ORDER BY price_cents LIMIT 50;
+annotations:
+  readOnlyHint: true
+  destructiveHint: false
+  idempotentHint: true
+  openWorldHint: false
+---
+kind: tool
+name: get-product-by-sku
+type: sqlite-sql
+source: catalog-db
+description: Get one product by its SKU. Returns sku, name, category, price_cents and stock.
+parameters:
+  - name: sku
+    type: string
+    description: The product SKU, for example "BK-001".
+statement: SELECT sku, name, category, price_cents, stock FROM products WHERE sku = ?;
+annotations:
+  readOnlyHint: true
+  destructiveHint: false
+  idempotentHint: true
+  openWorldHint: false
+---
+kind: toolset
+name: catalog-readonly
+tools:
+  - list-products-by-category
+  - get-product-by-sku

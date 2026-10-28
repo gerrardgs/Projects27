@@ -1,0 +1,64 @@
+# Xcode project definition; generate Keuangan.xcodeproj with `xcodegen generate` (XcodeGen 2.46.0).
+name: Keuangan
+options:
+  bundleIdPrefix: id.projects27
+  deploymentTarget:
+    iOS: "17.0"
+packages:
+  KeuanganCore:
+    path: ../KeuanganCore
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+    # Simulator builds are signed to run locally, so the Keychain works without a developer account.
+    "CODE_SIGN_IDENTITY[sdk=iphonesimulator*]": "-"
+targets:
+  Keuangan:
+    type: application
+    platform: iOS
+    sources: [App]
+    dependencies:
+      - package: KeuanganCore
+    entitlements:
+      path: App/Keuangan.entitlements
+      properties:
+        # The app's own Keychain group, where TokenStore keeps the session token.
+        keychain-access-groups: ["$(AppIdentifierPrefix)id.projects27.keuangan"]
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: Keuangan
+        CFBundleDevelopmentRegion: id
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
+        NSSpeechRecognitionUsageDescription: Ucapan Anda diubah menjadi teks untuk mengisi formulir transaksi. Anda tetap memeriksa dan menekan Simpan.
+        NSMicrophoneUsageDescription: Mikrofon dipakai saat Anda menekan Bicara untuk mencatat transaksi dengan suara.
+        # Development only: lets the simulator reach an API on this Mac over plain HTTP (localhost).
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+        API_BASE_URL: $(API_BASE_URL)
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: id.projects27.keuangan
+        API_BASE_URL: http://127.0.0.1:8080
+        GENERATE_INFOPLIST_FILE: NO
+  KeuanganUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [UITests]
+    dependencies:
+      - target: Keuangan
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: Keuangan
+schemes:
+  Keuangan:
+    build:
+      targets:
+        Keuangan: all
+        KeuanganUITests: [test]
+    test:
+      targets: [KeuanganUITests]

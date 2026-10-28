@@ -1,0 +1,16 @@
+{
+  "$description": "Foreground and background pairs that must meet WCAG 2.2 contrast in every theme. 4.5 = SC 1.4.3 normal text; 3 = SC 1.4.11 non-text (borders, focus rings, icons).",
+  "pairs": [
+    { "foreground": "theme.text.default", "background": "theme.surface.default", "minimum": 4.5 },
+    { "foreground": "theme.text.default", "background": "theme.surface.subtle", "minimum": 4.5 },
+    { "foreground": "theme.text.muted", "background": "theme.surface.default", "minimum": 4.5 },
+    { "foreground": "theme.text.muted", "background": "theme.surface.subtle", "minimum": 4.5 },
+    { "foreground": "theme.text.on-action", "background": "theme.action.default", "minimum": 4.5 },
+    { "foreground": "theme.text.on-action", "background": "theme.action.hover", "minimum": 4.5 },
+    { "foreground": "theme.action.default", "background": "theme.surface.default", "minimum": 4.5 },
+    { "foreground": "theme.feedback.danger", "background": "theme.surface.default", "minimum": 4.5 },
+    { "foreground": "theme.feedback.success", "background": "theme.surface.default", "minimum": 4.5 },
+    { "foreground": "theme.border.interactive", "background": "theme.surface.default", "minimum": 3 },
+    { "foreground": "theme.focus.ring", "background": "theme.surface.default", "minimum": 3 }
+  ]
+}

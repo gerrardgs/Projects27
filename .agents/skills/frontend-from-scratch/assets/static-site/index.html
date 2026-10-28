@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sign up for updates | Example Studio</title>
+    <meta name="description" content="An accessible, dependency-free starter page: semantic HTML, design tokens, light and dark themes, and a progressively enhanced form.">
+    <meta name="color-scheme" content="light dark">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="main.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <header class="site-header">
+      <a class="brand" href="/">Example Studio</a>
+      <nav aria-label="Primary">
+        <ul class="nav-list">
+          <li><a href="/" aria-current="page">Home</a></li>
+          <li><a href="/work">Work</a></li>
+          <li><a href="/about">About</a></li>
+        </ul>
+      </nav>
+      <button class="button button-secondary js-only" type="button" id="theme-toggle" aria-pressed="false">
+        Dark theme
+      </button>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <section class="hero" aria-labelledby="page-title">
+        <h1 id="page-title">Design notes, once a month</h1>
+        <p class="lead">
+          Practical articles on interface design, accessibility and front-end craft. No tracking, and you can
+          unsubscribe from any email.
+        </p>
+      </section>
+
+      <section class="card" aria-labelledby="signup-title">
+        <h2 id="signup-title">Sign up</h2>
+
+        <div class="error-summary" id="error-summary" tabindex="-1" hidden>
+          <h3>There is a problem</h3>
+          <ul id="error-list"></ul>
+        </div>
+
+        <form id="signup-form" action="/subscribe" method="post" novalidate>
+          <div class="field">
+            <label for="name">Name</label>
+            <input id="name" name="name" type="text" autocomplete="name" required maxlength="100" aria-describedby="name-error">
+            <p class="field-error" id="name-error" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="email">Email address</label>
+            <p class="field-hint" id="email-hint">We only use it to send the newsletter.</p>
+            <input id="email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="254" aria-describedby="email-hint email-error">
+            <p class="field-error" id="email-error" hidden></p>
+          </div>
+
+          <fieldset class="field">
+            <legend>How often?</legend>
+            <div class="choice">
+              <input id="frequency-monthly" name="frequency" type="radio" value="monthly" checked>
+              <label for="frequency-monthly">Monthly digest</label>
+            </div>
+            <div class="choice">
+              <input id="frequency-quarterly" name="frequency" type="radio" value="quarterly">
+              <label for="frequency-quarterly">Quarterly highlights</label>
+            </div>
+          </fieldset>
+
+          <button class="button" type="submit">Subscribe</button>
+          <p class="form-status" id="form-status" role="status"></p>
+        </form>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>Example content. Replace the brand, copy and form action before publishing.</p>
+    </footer>
+  </body>
+</html>

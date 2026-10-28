@@ -1,0 +1,56 @@
+name: Dependabot auto-merge
+
+# Turns on auto-merge for Dependabot's patch and minor updates, so they land as soon as every required check
+# passes. Major updates always wait for a person. Security updates follow the same rule: patch and minor merge
+# automatically, majors wait.
+# Safety gate: auto-merge is enabled only when the base branch requires status checks (branch protection or a
+# ruleset). Without required checks GitHub would merge at once, untested, so the workflow stops with a notice.
+# The repository setting "Allow auto-merge" must also be on (see SECURITY.md, maintainer checklist).
+
+on: pull_request
+
+permissions: {}
+
+concurrency:
+  group: dependabot-auto-merge-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  auto-merge:
+    name: Enable auto-merge for patch and minor updates
+    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.repository == 'gerrardgs/Projects27'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write # merge the pull request once checks pass
+      pull-requests: write # turn on auto-merge
+    steps:
+      - name: Read the update's metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
+        with:
+          github-token: ${{ github.token }}
+      - name: Check that the base branch requires status checks
+        id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          BASE: ${{ github.event.pull_request.base.ref }}
+        run: |
+          classic="$(gh api "repos/$REPOSITORY/branches/$BASE" --jq '((.protection.required_status_checks.contexts // []) + (.protection.required_status_checks.checks // [])) | length')"
+          rules="$(gh api "repos/$REPOSITORY/rules/branches/$BASE" --jq '[.[] | select(.type == "required_status_checks")] | length')"
+          if [ "$classic" -gt 0 ] || [ "$rules" -gt 0 ]; then
+            echo "required=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "required=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::$BASE does not require status checks; auto-merge stays off so nothing merges untested."
+          fi
+      - name: Enable auto-merge
+        if: >-
+          steps.gate.outputs.required == 'true' &&
+          (steps.metadata.outputs.update-type == 'version-update:semver-patch' ||
+           steps.metadata.outputs.update-type == 'version-update:semver-minor')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: gh pr merge --auto --squash "$PR_URL"

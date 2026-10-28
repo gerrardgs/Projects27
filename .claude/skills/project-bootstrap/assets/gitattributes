@@ -1,0 +1,17 @@
+# Copy to the repository root as .gitattributes.
+# Normalise line endings in the repository; check out text files with LF on every OS.
+* text=auto eol=lf
+
+# Windows-only scripts keep CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary files: no line-ending conversion, no textual diff.
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.gz binary

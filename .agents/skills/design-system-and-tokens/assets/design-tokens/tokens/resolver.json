@@ -1,0 +1,22 @@
+{
+  "name": "Example design system",
+  "version": "2025.10",
+  "description": "Primitive palette and scales, plus a light and a dark theme of semantic tokens.",
+  "sets": {
+    "base": {
+      "description": "Primitives: colour palette, spacing, radius, typography, motion.",
+      "sources": [{ "$ref": "base.json" }]
+    }
+  },
+  "modifiers": {
+    "theme": {
+      "description": "Colour theme. Every context must define the same semantic token paths.",
+      "contexts": {
+        "light": [{ "$ref": "light.json" }],
+        "dark": [{ "$ref": "dark.json" }]
+      },
+      "default": "light"
+    }
+  },
+  "resolutionOrder": [{ "$ref": "#/sets/base" }, { "$ref": "#/modifiers/theme" }]
+}

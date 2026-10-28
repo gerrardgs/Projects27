@@ -1,0 +1,40 @@
+# Continuous integration for a Python project.
+# Copy to .github/workflows/ci.yml. Expects pyproject.toml with a "dev" dependency group
+# (PEP 735) containing pytest, ruff, mypy and pip-audit. Installing groups needs pip 25.1 or later.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13", "3.14", "3.15"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install . --group dev
+      - run: ruff format --check .
+      - run: ruff check .
+      - run: mypy .
+      - run: pytest
+      - run: pip-audit --strict

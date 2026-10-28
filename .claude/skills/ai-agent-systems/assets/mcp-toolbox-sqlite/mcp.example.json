@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "catalog": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@toolbox-sdk/server@1.14.0",
+        "--config",
+        "/absolute/path/to/mcp-toolbox-sqlite/tools.yaml",
+        "--stdio",
+        "--disable-version-check"
+      ],
+      "env": {
+        "CATALOG_DB": "${CATALOG_DB}"
+      }
+    }
+  }
+}

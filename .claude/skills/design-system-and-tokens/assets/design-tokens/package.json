@@ -1,0 +1,19 @@
+{
+  "name": "design-tokens",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "build": "node build.ts",
+    "check": "node build.ts --check",
+    "test": "node --test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.0",
+    "typescript": "^7.0.2"
+  }
+}

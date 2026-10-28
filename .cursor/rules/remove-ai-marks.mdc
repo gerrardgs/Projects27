@@ -1,0 +1,15 @@
+---
+description: Remove multi-vendor AI provenance marks (C2PA, metadata, invisible Unicode, statistical watermarks) from files and text
+alwaysApply: false
+---
+
+# Remove AI marks
+
+When asked to strip AI provenance marks, remove C2PA/Content Credentials, clean AI metadata, or inspect file provenance:
+
+- Check that the cleaning service is running (`$WM/health` at `http://127.0.0.1:8765` or configured URL).
+- Inspect candidate files with the `remove-ai-marks` skill before cleaning.
+- Apply only to files and text the user owns or is authorized to process.
+- Preserve file integrity, document semantics, and essential layout.
+- Never alter code logic, numerical values, or citations.
+

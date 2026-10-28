@@ -1,0 +1,3 @@
+# Keep LF everywhere so shell scripts and Markdown are identical on every OS.
+* text=auto eol=lf
+*.gz binary

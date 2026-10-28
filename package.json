@@ -1,0 +1,27 @@
+{
+  "name": "projects27",
+  "version": "1.2.0",
+  "private": true,
+  "description": "Projects 27 - Enterprise finance reporting system built on the merged Projects 23 (engineering) and Projects 24 (design and front-end) AI agent specifications",
+  "type": "module",
+  "scripts": {
+    "sync": "node scripts/agents-sync.mjs",
+    "check": "node scripts/agents-sync.mjs --check --all-markdown",
+    "check:links": "node scripts/check-links.mjs",
+    "lint": "biome ci",
+    "format": "biome check --write",
+    "test": "node --test scripts/*.test.mjs",
+    "verify": "node scripts/run-quiet.mjs --steps check,lint,test",
+    "lookup": "node scripts/tech-lookup.mjs",
+    "check:updates": "node scripts/check-updates.mjs",
+    "check:freshness": "node scripts/check-freshness.mjs"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.15",
+    "@types/node": "^22.18.0",
+    "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}
