@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.3.0: enterprise finance system with complete engineering and design rules, text hygiene, and AI marks removal (2026-10-29)
+
+### Added
+
+- Initial complete release of Projects 27 combining backend engineering rules from Projects 23 with digital design, accessibility, and front-end rules from Projects 24.
+- Rule 18 (`18-text-hygiene-and-provenance.md`): text hygiene, Unicode cleaning, and provenance marks removal.
+- Skills `clean-user-facing-text` and `remove-ai-marks`: comprehensive zero-dependency Unicode cleaning scripts and multi-vendor AI watermark removal service stack.
+- Skill `content-hygiene`: asset wrapper for unicode-hygiene text processing.
+- Full set of 61 agent skills synchronized to `.claude/skills/`.
+- Complete financial reporting architecture, API endpoints, evaluation suites, and offline data storage.
+
 ## Unreleased: spec sync with Projects 23 2.19.0 and Projects 24 1.13.0 (CLI first, small output)
 
 ### Added
