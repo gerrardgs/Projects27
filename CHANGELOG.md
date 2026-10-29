@@ -2,6 +2,33 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.8.0: skills index out of the always-on context, release notes and inherited history separated (2026-10-29)
+
+### Changed
+
+- **Always-on context made structural, not squeezed**: the per-skill table moved from `AGENTS.md` to `.agents/SKILLS.md`, which is read on demand. Tools that support Agent Skills (Claude Code, Codex, Gemini CLI, Antigravity, Cursor) already load every skill's name and description, so the table in `AGENTS.md` was paid for on every turn twice. `AGENTS.md` keeps the categories and a pointer, and any other tool is told to read the index. Antigravity's documented budget for global and always-on rules is 20,000 tokens, and files beyond it are demoted to pointers ([Antigravity rules](https://antigravity.google/docs/rules), checked 2026-10-29).
+- **Validator** (`scripts/agents-sync.mjs`):
+  - the new pure function `indexProblems` checks that every skill is linked from `AGENTS.md` or listed in `.agents/SKILLS.md` (which `AGENTS.md` must then link), and that the index lists nothing that does not exist;
+  - the always-on check now prints the remaining headroom and warns within 5% of the budget, so the next addition is planned instead of discovered;
+  - one new test.
+- **Docs**: architecture (size, validation), contributing (where to add a skill), debugging (the new messages) and README updated.
+- **Result**: always-on context exactly 20,000 → about 18,400 tokens (headroom about 1,600). The rows for rules 19, 20 and 21 are separate again.
+
+### Fixed
+
+- **Release notes**:
+  - `.github/releases/` held Projects 24's notes for v1.0.0 to v1.12.0, so this repository's tags v1.5.0 to v1.7.0 would have been published with Projects 24's text, and v1.3.0 and v1.4.0 had no notes at all.
+  - The inherited notes moved to `docs/spec/history/projects24-releases/` (with a README).
+  - Projects 27's own notes for v1.3.0 to v1.8.0 were written from this changelog.
+- **Changelog**: Projects 24's entries 1.0.0 to 1.13.0 sit under a "History inherited from Projects 24" heading, and their headings start with "Projects 24", so they no longer share version numbers with this repository's entries.
+- **README**:
+  - the catalog listed 45 of 66 skills; a fifth section adds the 21 missing (engineering, data and AI, and finance);
+  - section counts, the "37 skills and 16 rules" sentence and the architecture diagram were copied from Projects 24 and now match this repository (21 rules, 7 always on, 66 skills).
+
+### Known
+
+- GitHub Actions has never run for this repository (0 runs, although the six workflows are active). The owner should check Settings → Actions → General.
+
 ## 1.7.0: secret scanning in layers, and leaked-secret response (2026-10-29)
 
 The repository owner asked to adopt [gitleaks](https://github.com/gitleaks/gitleaks) (MIT, v8.30.1), [TruffleHog](https://github.com/trufflesecurity/trufflehog) (AGPL-3.0, v3.99.7, used as a tool), [GitHub push protection](https://docs.github.com/en/code-security/concepts/secret-security/push-protection) and [GitHub Secret Protection](https://github.com/security/advanced-security/secret-protection) as skills and rules, checked on 2026-10-29. Same content as Projects 23 v2.24.0 and Projects 24 v1.18.0, adapted to this product. The existing `secrets` CI job (gitleaks 8.30.1, checksum-verified, full history and files) stays as it is.
@@ -210,7 +237,11 @@ Projects 27 starts from Projects 24 version 1.12.0 and adds everything from Proj
 - Rule 04 section 9 numbered two steps "8"; the last is now 9.
 - `scripts/audit-lockfiles.mjs` keeps the original error as `cause` when `npm audit` fails, as required by the Projects 23 clean-code lint that now also runs on Projects 24 scripts.
 
-## 1.13.0: CLI first, small output (2026-10-28)
+## History inherited from Projects 24 (1.0.0 to 1.13.0)
+
+The entries below are Projects 24's changelog up to the version this repository was created from (2026-10-28). Their version numbers belong to Projects 24, not to this repository; Projects 24's release notes for them are kept in [`docs/spec/history/projects24-releases/`](docs/spec/history/projects24-releases/README.md).
+
+## Projects 24 1.13.0: CLI first, small output (2026-10-28)
 
 ### Added
 
@@ -219,7 +250,7 @@ Projects 27 starts from Projects 24 version 1.12.0 and adds everything from Proj
 - `scripts/run-quiet.mjs` (Node.js 22+, no dependencies): runs a command or several npm scripts, prints `PASS <step> (<seconds>s)` or `FAIL` with the last lines and the full log path, counts real warning lines, and exits with the first failing code. 5 tests (script tests 36 → 41). On this repository's `npm test` the output fell from 3,373 to 132 bytes. The installer copies it.
 - `npm run verify`: the spec checks, Biome and the script tests in one command with one line per step. `project-bootstrap` adds a `verify` script to new projects; `CLAUDE.md` notes the Bash tool's background option for servers; prompt library: "Run and verify economically".
 
-## 1.12.0: plan first, blind spots and the chaos engineering cycle (2026-10-28)
+## Projects 24 1.12.0: plan first, blind spots and the chaos engineering cycle (2026-10-28)
 
 ### Added
 
@@ -230,7 +261,7 @@ Projects 27 starts from Projects 24 version 1.12.0 and adds everything from Proj
 - Skill `resilience-and-chaos-engineering` section 5 is now the six-step cycle: define the steady state, state the failure hypothesis, create the chaos safely (blast radius, abort conditions), observe against the expectation, evaluate (held or disproved, root cause, impact), and plan, implement and re-test the improvement; new `references/experiment-record.md` template. Rule 07 and `AGENTS.md` step 5 point to it.
 - Prompt library: "Plan first, then wait" and "Chaos experiment".
 
-## 1.11.0: only the human author is credited (2026-10-26)
+## Projects 24 1.11.0: only the human author is credited (2026-10-26)
 
 ### Added
 
@@ -246,7 +277,7 @@ Projects 27 starts from Projects 24 version 1.12.0 and adds everything from Proj
 
 - The v1.10.0 commit carried a `Co-Authored-By` trailer for an AI agent; its message was amended with the tree unchanged.
 
-## 1.10.0: the complete project documentation set (2026-10-23)
+## Projects 24 1.10.0: the complete project documentation set (2026-10-23)
 
 ### Added
 
@@ -258,7 +289,7 @@ Projects 27 starts from Projects 24 version 1.12.0 and adds everything from Proj
 - Project bootstrap: `CHANGELOG.md`, the linter config, community health files (`CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`) for shared repositories, the documentation set and a JavaScript monorepo layout (`apps/`, `packages/`, `scripts/`, `docs/`).
 - AGENTS.md: rule 16 and the skill in the indexes; the definition of done includes updated docs. CLAUDE.md lists rule 16 among the on-demand rules. README, architecture, operational manual and prompt library updated; 37 skills and 16 rules.
 
-## 1.9.0: anti-slop filter for UI, copy and code comments (2026-10-23)
+## Projects 24 1.9.0: anti-slop filter for UI, copy and code comments (2026-10-23)
 
 Adapted from [antislop](https://github.com/miqdadbadjuber/anti-slop) by Miqdad Badjuber (MIT, version 3.2.21, commit `69416cf`), reviewed on 2026-10-23.
 
@@ -278,7 +309,7 @@ Adapted from [antislop](https://github.com/miqdadbadjuber/anti-slop) by Miqdad B
 - Its absolute ban on em dashes became a default for agent-written copy with a brand-voice override; its `// TODO` placeholder for unbuilt controls became a visible "Coming soon" label plus a "Not done" line in the report, because rule 01 forbids TODO placeholders in finished work.
 - The installer, plugins, saved usage-mode settings and the bundled contrast scripts were not copied; contrast is measured with axe-core and the tools in rule 10.
 
-## 1.8.0: always-current dependencies, tools and patches (2026-10-22)
+## Projects 24 1.8.0: always-current dependencies, tools and patches (2026-10-22)
 
 Every fact below was checked against its primary source on 2026-10-22.
 
@@ -292,7 +323,7 @@ Every fact below was checked against its primary source on 2026-10-22.
 - `.github/dependabot.yml` and the ci-cd-pipeline template: weekly checks became daily. The 7-day cooldown on version updates stays, because a shorter one fails zizmor's `dependabot-cooldown` audit and removes the window in which compromised releases are usually caught.
 - SECURITY.md: the dependency controls and a maintainer checklist item for "Allow auto-merge". CONTRIBUTING: what to do when the freshness workflow fails.
 
-## 1.7.0: media production, Claude Design, MCP, security audits, safer changes and releases (2026-10-22)
+## Projects 24 1.7.0: media production, Claude Design, MCP, security audits, safer changes and releases (2026-10-22)
 
 Every fact below was checked against its primary source between 2026-10-17 and 2026-10-22; where only a secondary source was available, the reference says so.
 
@@ -324,7 +355,7 @@ Every fact below was checked against its primary source between 2026-10-17 and 2
 - `graphic-design-production` and `motion-and-interaction` link to the new skills. README, architecture and AGENTS.md skill index list 35 skills; the always-on context is about 16,000 tokens (Antigravity's budget is 20,000).
 - Existing guidance that told agents to remove code now asks for approval first: commented-out and dead code (rule 02), leftovers (rule 15 now limits clean-up to what the agent added), unused dependencies and CSS (rule 12, web performance skill), and code made unused or replaced by a strangler-fig migration (change-existing-code, which also lists deletion as a reason to stop and ask).
 
-## 1.6.0: engineering concepts and chaos engineering (2026-10-16)
+## Projects 24 1.6.0: engineering concepts and chaos engineering (2026-10-16)
 
 ### Added
 
@@ -333,7 +364,7 @@ Every fact below was checked against its primary source between 2026-10-17 and 2
 - `docs/ENGINEERING-CONCEPTS.md`: the 18 knowledge areas of the SWEBOK Guide V4.0, the nine ISO/IEC 25010:2023 quality characteristics, design principles (KISS, YAGNI, DRY, SOLID, separation of concerns, the robustness principle with RFC 9413's caution), architecture (rendering strategies, micro-frontends, BFF, hexagonal, DDD, C4, arc42, ADRs, twelve-factor), delivery (DORA's five metrics, trunk-based development, platform engineering, FinOps), testing, SRE and chaos engineering, security (CISA Secure by Design, NIST SSDF, OWASP SAMM, STRIDE, SLSA), human-centred, sustainability (SCI, ISO/IEC 21031:2024) and AI-assisted engineering, each mapped to the rule or skill that applies it. Linked from `AGENTS.md`, shipped by the installer.
 - Operational manual: two scenarios (chaos and resilience; "which engineering concept applies?").
 
-## 1.5.0: research update from public and open-source knowledge (2026-10-16)
+## Projects 24 1.5.0: research update from public and open-source knowledge (2026-10-16)
 
 Every addition below was checked against its primary source on 2026-10-16.
 
@@ -353,7 +384,7 @@ Every addition below was checked against its primary source on 2026-10-16.
 - Anti-hallucination playbook: errors in a published standard, and vendor claims taken as fact.
 - Link checker: hosts that answer 404 to every automated client (verified manually: `www.ftc.gov`) are reported as warnings, with a test (script tests 14 → 15).
 
-## 1.4.0: security audit and updates (2026-10-16)
+## Projects 24 1.4.0: security audit and updates (2026-10-16)
 
 ### Added
 
@@ -371,7 +402,7 @@ Every addition below was checked against its primary source on 2026-10-16.
 
 gitleaks: 0 secrets in 3 commits and all files. Semgrep 1.181.0 (JavaScript, TypeScript, Node.js, Python, Dockerfile, GitHub Actions, secrets, security audit): 0 findings in 157 files. `npm audit`: 0 vulnerabilities in every lockfile except the documented `braces` advisory (no patch exists; unreachable in this repository). `pip-audit`: no known vulnerabilities. actionlint, zizmor (auditor persona), shellcheck: clean.
 
-## 1.3.0: clean code and clean execution audit (2026-10-16)
+## Projects 24 1.3.0: clean code and clean execution audit (2026-10-16)
 
 The concept is now explicit and the repository follows it.
 
@@ -401,7 +432,7 @@ The concept is now explicit and the repository follows it.
 
 The parameter limit of 4 (ESLint `max-params`) was a measurement aid for this audit; rule 02 itself says "prefer few parameters".
 
-## 1.2.0: deployment, CI, security headers, tools catalog, prompt library (2026-10-15, stages 2 and 3 of the full audit)
+## Projects 24 1.2.0: deployment, CI, security headers, tools catalog, prompt library (2026-10-15, stages 2 and 3 of the full audit)
 
 ### Added
 
@@ -421,7 +452,7 @@ The parameter limit of 4 (ESLint `max-params`) was a measurement aid for this au
 - `AGENTS.md`: indexes for the two new skills, pointers to the catalog and prompt library, and an operating condition for tools the spec does not mention. Operational manual: five more scenarios.
 - README (restyled outside this session) corrected: CI status stated precisely (all 18 Validate jobs passed on GitHub for commit `7ff1512`; the changes in this release are verified locally and run in CI when pushed), the automated accessibility coverage figure now cites Deque's 57% study instead of an unsourced "30–50%", touch targets stated as 44 px with the 24 px WCAG minimum, "ISG" corrected to ISR, "eliminating hallucinations" reworded to "reduce", template verification stated precisely, counts updated to 27 skills.
 
-## 1.1.0: Figma integration, mobile, agent capabilities (2026-10-15, stage 1 of the full audit)
+## Projects 24 1.1.0: Figma integration, mobile, agent capabilities (2026-10-15, stage 1 of the full audit)
 
 ### Added
 
@@ -435,7 +466,7 @@ The parameter limit of 4 (ESLint `max-params`) was a measurement aid for this au
 
 - Adobe XD status stated precisely from Adobe's FAQ: no new features, bug, security and privacy fixes continue, no end date announced.
 
-## 1.0.0: design and front-end specification (2026-10-15)
+## Projects 24 1.0.0: design and front-end specification (2026-10-15)
 
 Projects 24 starts as a full copy of [Projects 23](https://github.com/gerrardgs/Projects23) version 2.1.0 (engineering rules, nine skills, templates, validator, installer and CI) and extends it for UI/UX designers, digital graphic designers and front-end developers.
 

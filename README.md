@@ -56,33 +56,34 @@ Most AI coding assistants struggle with visual design and front-end engineering:
 3. **Interactive Completeness & Micro-Interactions**:
    Static design mockups only show the happy path. Projects 27 forces AI agents to design and implement every user interface state (default, hover, focus-visible, active, disabled, loading, skeleton, error, and empty), responsive viewports across mobile/tablet/desktop, purposeful micro-interactions (View Transitions, scroll-driven animations as progressive enhancement, GSAP/Motion, reduced-motion preferences), and Core Web Vitals performance budgets (LCP ≤ 2.5s, INP ≤ 200ms, CLS ≤ 0.1).
 4. **Complete Design-to-Code Lifecycle Mastery**:
-   37 modular skills and 16 normative rules that cover every phase: from UX research, wireframing, high-fidelity UI design, digital graphic assets (SVG, vector, social, print prep), and photo, video, colour grading and motion graphics production, to design-to-code handoff, modern framework engineering, mobile platforms, automated visual QA, and production release inherited from Projects 23.
+   66 modular skills and 21 normative rules that cover every phase: from UX research, wireframing, high-fidelity UI design, digital graphic assets (SVG, vector, social, print prep), and photo, video, colour grading and motion graphics production, to design-to-code handoff, modern framework engineering, mobile platforms, automated visual QA, and production release inherited from Projects 23.
 
 ---
 
 ## What Is Inside
 
 ```text
-Projects 27 Architecture: Digital Design & Front-End Engineering
-================================================================
+Projects 27 Architecture: Merged Agent Specification and Finance Product
+=======================================================================
 
   +-------------------------------------------------------------------------+
-  | Core (Always Loaded): AGENTS.md (~173 lines)                            |
-  | Design & front-end priorities, non-negotiables, design-to-code workflow |
+  | Core (Always Loaded): AGENTS.md (~140 lines)                            |
+  | Priorities, non-negotiables, workflow, rules index, skills pointer      |
   +-------------------------------------------------------------------------+
        |                                                 |
        v (links to)                                      v (links to)
   +-----------------------------------+             +-----------------------------------+
   | Rules (.agents/rules/)            |             | Skills (.agents/skills/)          |
-  | 16 normative rules:               |             | 37 on-demand step-by-step guides: |
-  | - 7 Always-On (core, clean code,  |             | - 10 Digital Design & UI/UX Skills|
-  |   verification, security, design  |             | - 4 Photo, Video, Colour & Motion |
-  |   principles, a11y, clean exec.)  |             | - 12 Front-End & Mobile Skills    |
-  | - 9 On-Demand (dependencies,      |             | - 11 Software Lifecycle Skills    |
-  |   errors, testing, git workflow,  |             | + 8 Verified runnable templates   |
-  |   front-end code, web perf,       |             |   + CI, Lighthouse, deploy configs|
-  |   assets/licensing, UX writing,   |             |                                   |
-  |   project documentation)          |             |                                   |
+  | 21 normative rules:               |             | 66 on-demand step-by-step guides  |
+  | - 7 Always-On (core, clean code,  |             | (index: .agents/SKILLS.md):       |
+  |   verification, security, design  |             | - 13 Digital Design & UI/UX       |
+  |   principles, a11y, clean exec.)  |             | - 4 Photo, Video, Colour & Motion |
+  | - 14 On-Demand (dependencies,     |             | - 12 Front-End & Mobile           |
+  |   errors, testing, git, front-end,|             | - 16 Software Lifecycle           |
+  |   performance, assets, UX writing,|             | - 21 Engineering, Data and AI,    |
+  |   docs, financial integrity, text |             |   Finance                         |
+  |   hygiene, agentic delivery,      |             | + tested templates and helpers    |
+  |   reverse engineering, secrets)   |             |                                   |
   +-----------------------------------+             +-----------------------------------+
        |                                                 |
        +-----------------------+-------------------------+
@@ -91,15 +92,15 @@ Projects 27 Architecture: Digital Design & Front-End Engineering
   +-------------------------------------------------------------------------+
   | Tool Adapters, Mirrors & Reference Library                              |
   | CLAUDE.md, GEMINI.md, .claude/skills/ (auto-sync), Copilot, Aider, etc. |
-  | docs/: DESIGN-REFERENCES (470+), TOOLKIT (350+ tools), PROMPT-LIBRARY   |
+  | docs/spec/: DESIGN-REFERENCES, TOOLKIT, PROMPT-LIBRARY; product docs/   |
   +-------------------------------------------------------------------------+
 ```
 
 | Layer | Location | Loaded | Contents |
 | :--- | :--- | :--- | :--- |
-| **Core** | [`AGENTS.md`](AGENTS.md) | Always | Priorities, non-negotiables, design-to-code workflow, rule and skill indexes, operating conditions, definition of done (about 173 lines) |
-| **Rules** | [`.agents/rules/`](.agents/rules/) | Always (7) or when relevant (9) | Core principles, clean code, verification, security, **design principles, accessibility (WCAG 2.2 AA), clean execution**, dependencies, error handling, testing, Git workflow, **front-end code, web performance, visual assets & licensing, UX writing & ethics, project documentation** |
-| **Skills** | [`.agents/skills/`](.agents/skills/) | When task matches | 37 step-by-step procedures (10 digital design & UI/UX, 4 photo, video, colour & motion, 12 front-end & mobile, 11 software lifecycle) with tested templates and references |
+| **Core** | [`AGENTS.md`](AGENTS.md) | Always | Priorities, non-negotiables, design-to-code workflow, rules index and a pointer to the skills index ([`.agents/SKILLS.md`](.agents/SKILLS.md)), operating conditions, definition of done (about 173 lines) |
+| **Rules** | [`.agents/rules/`](.agents/rules/) | Always (7) or when relevant (14) | Core principles, clean code, verification, security, **design principles, accessibility (WCAG 2.2 AA), clean execution**, dependencies, error handling, testing, Git workflow, **front-end code, web performance, visual assets & licensing, UX writing & ethics, project documentation**, financial integrity, text hygiene and provenance, agentic delivery and AI review, reverse engineering, secret scanning |
+| **Skills** | [`.agents/skills/`](.agents/skills/) | When task matches | 66 step-by-step procedures (13 digital design & UI/UX, 4 photo, video, colour & motion, 12 front-end & mobile, 16 software lifecycle, 21 engineering, data and AI, and finance), listed in [`.agents/SKILLS.md`](.agents/SKILLS.md) with tested templates and references |
 | **Reference Library** | [`docs/DESIGN-REFERENCES.md`](docs/spec/DESIGN-REFERENCES.md) | When needed | About 470 curated, link-checked sources in 27 sections: standards, accessibility, UX, UI, design systems, typography, colour, imagery, branding and print, motion, data viz, tools, AI workflows, HTML/CSS/JS, frameworks, browser support, testing, performance, security, SEO, i18n, ethics and law, courses, books, communities, inspiration, photo, video, colour and motion production |
 | **Tested Templates** | Various under `.agents/skills/` | On demand / in CI | Runnable token pipelines, Figma variables sync, accessible static site with security headers, axe-core scanner, browser chaos experiments, web video and image pipeline, Node.js & Python backend services, front-end CI, Lighthouse CI budgets, GitHub Pages deploy |
 | **Tools Catalog** | [`docs/TOOLKIT.md`](docs/spec/TOOLKIT.md) | When needed | 350+ commonly used tools, libraries, platforms and services by phase, with official links, plus the rule for adopting any tool that is not listed |
@@ -163,7 +164,7 @@ Procedures covering production web and mobile implementation, modern frameworks,
 | **QA** | [frontend-testing-and-visual-qa](.agents/skills/frontend-testing-and-visual-qa/SKILL.md) | Component testing (Testing Library), end-to-end testing (Playwright), visual regression snapshots, cross-browser and real-device QA matrices |
 | **Review** | [design-critique-and-review](.agents/skills/design-critique-and-review/SKILL.md) | Heuristic evaluations, visual hierarchy critique, design system token compliance, accessibility and UX writing passes with severity-ranked findings |
 
-### 4. Software Lifecycle Skills (11 Skills: 9 Inherited from Projects 23)
+### 4. Software Lifecycle Skills (16 Skills: 9 Inherited from Projects 23)
 
 Complete software engineering lifecycle foundation ensuring bulletproof tooling, security, and automated delivery:
 
@@ -187,6 +188,36 @@ Complete software engineering lifecycle foundation ensuring bulletproof tooling,
 | **Ship** | [deploy-and-release](.agents/skills/deploy-and-release/SKILL.md) | Production launch checklists, zero-downtime deployments, canary/blue-green rollouts, observability, and rollback plans |
 
 ---
+
+### 5. Engineering, Data and AI, and Finance Skills (21 Skills, from Projects 23 plus finance)
+
+Back-end, data, AI, cloud and operations procedures inherited from [Projects 23](https://github.com/gerrardgs/Projects23), and the finance skill of this product:
+
+| Domain | Skill | Highlights |
+| :--- | :--- | :--- |
+| **Ai Agent Systems** | [ai-agent-systems](.agents/skills/ai-agent-systems/SKILL.md) | Design, build, secure and evaluate AI agents and multi-agent systems that plan and call tools |
+| **Anti Slop** | [anti-slop](.agents/skills/anti-slop/SKILL.md) | Keep generic AI-generated patterns ("slop") out of code comments, documentation, commit and pull request text, UI copy and user interfaces |
+| **Api Integration** | [api-integration](.agents/skills/api-integration/SKILL.md) | Integrate with third-party and partner APIs in any sector |
+| **Backend Engineering** | [backend-engineering](.agents/skills/backend-engineering/SKILL.md) | Design and build backend services |
+| **Chaos Engineering** | [chaos-engineering](.agents/skills/chaos-engineering/SKILL.md) | Plan and run chaos engineering and resilience experiments safely |
+| **Cloud Infrastructure** | [cloud-infrastructure](.agents/skills/cloud-infrastructure/SKILL.md) | Design, provision, secure and operate cloud and platform infrastructure as code |
+| **Computer Vision** | [computer-vision](.agents/skills/computer-vision/SKILL.md) | Build, evaluate and deploy computer vision systems |
+| **Data Analysis** | [data-analysis](.agents/skills/data-analysis/SKILL.md) | Answer business and research questions with data correctly |
+| **Data Engineering** | [data-engineering](.agents/skills/data-engineering/SKILL.md) | Design, build and operate batch and streaming data pipelines and big-data platforms |
+| **Feature Specification** | [feature-specification](.agents/skills/feature-specification/SKILL.md) | Turn a feature request, user story or vague idea into a clear specification, technical plan and ordered task list before writing code (spec-driven development) |
+| **Finance Reporting Systems** | [finance-reporting-systems](.agents/skills/finance-reporting-systems/SKILL.md) | Design, build, test and operate enterprise finance reporting software |
+| **It Operations** | [it-operations](.agents/skills/it-operations/SKILL.md) | Run and automate back-office and infrastructure IT ("back-line" IT) |
+| **Llm Applications** | [llm-applications](.agents/skills/llm-applications/SKILL.md) | Build production features on large language models and generative AI |
+| **Machine Learning** | [machine-learning](.agents/skills/machine-learning/SKILL.md) | Frame, build, evaluate, document and operate machine learning and deep learning models (classical ML, neural networks, time series, recommendation) with leakage-free data splits, honest baselines and metrics, reproducible experiments, fairness and explainability checks, and MLOps practices for deployment and monitoring. Use for data science and ML/DL work in scikit-learn, PyTorch, JAX, TensorFlow/Keras, XGBoost or LightGBM, including training, fine-tuning, hyperparameter tuning, experiment tracking, model cards and drift monitoring |
+| **Ml Inference Serving** | [ml-inference-serving](.agents/skills/ml-inference-serving/SKILL.md) | Serve machine learning and LLM models in production for online, batch, streaming and edge inference with real-time latency targets |
+| **Quality Assurance** | [quality-assurance](.agents/skills/quality-assurance/SKILL.md) | Plan and run quality assurance beyond unit tests |
+| **Rag Systems** | [rag-systems](.agents/skills/rag-systems/SKILL.md) | Build and improve retrieval-augmented generation (RAG) systems |
+| **Software Architecture** | [software-architecture](.agents/skills/software-architecture/SKILL.md) | Design and review software architecture and system design |
+| **Technical Documentation** | [technical-documentation](.agents/skills/technical-documentation/SKILL.md) | Write and maintain documentation that people can use |
+| **Technology Adoption** | [technology-adoption](.agents/skills/technology-adoption/SKILL.md) | Work correctly with any programming language, framework, library, database, platform, cloud service, SaaS product or developer tool, including ones no other skill covers |
+| **Web Frontend Engineering** | [web-frontend-engineering](.agents/skills/web-frontend-engineering/SKILL.md) | Build and review web user interfaces and web apps that are accessible (WCAG 2.2), fast (Core Web Vitals), secure in the browser, and well tested |
+
+The complete list with when to use each skill is in [`.agents/SKILLS.md`](.agents/SKILLS.md).
 
 ## Tested Runnable Templates
 

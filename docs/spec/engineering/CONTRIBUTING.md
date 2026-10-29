@@ -49,7 +49,7 @@ metadata:
 - `name`: 1 to 64 characters, lowercase letters, digits and single hyphens, identical to the folder name.
 - `description`: 1 to 1,024 characters; the agent decides from this text alone whether to load the skill.
 - Body under 500 lines; move detail to `references/` and templates to `assets/`, linked one level deep from `SKILL.md`.
-- Add the skill to the skills index in `AGENTS.md` and, if relevant, to the scenario router in `docs/AGENT-OPERATIONAL-MANUAL.md`.
+- Add the skill to the skills index `.agents/SKILLS.md` (and its category to `AGENTS.md` section 5 if it is new) and, if relevant, to the scenario router in `docs/AGENT-OPERATIONAL-MANUAL.md`.
 
 ## 3. Links
 

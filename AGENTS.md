@@ -12,7 +12,7 @@ This file is the **always-on core**. Deeper guidance loads on demand:
 - **Reference library**: [DESIGN-REFERENCES](docs/spec/DESIGN-REFERENCES.md); domain coverage: [domain-coverage](.agents/domain-coverage.md) and [engineering-concepts](.agents/engineering-concepts.md)
 - **Tools, prompts & concepts**: [TOOLKIT](docs/spec/TOOLKIT.md), [PROMPT-LIBRARY](docs/spec/PROMPT-LIBRARY.md), [ENGINEERING-CONCEPTS](docs/spec/ENGINEERING-CONCEPTS.md)
 
-If your tool does not load these folders automatically, **open the matching file from the tables in sections 4 and 5 before starting that kind of work.**
+If your tool does not load these folders automatically, **open the matching rule from the table in section 4, or the matching skill from the [skills index](.agents/SKILLS.md), before starting that kind of work.**
 
 ---
 
@@ -74,39 +74,15 @@ If your tool does not load these folders automatically, **open the matching file
 | [16-project-documentation.md](.agents/rules/16-project-documentation.md) | on demand | The complete, current docs/ set (check-docs) |
 | [17-financial-integrity.md](.agents/rules/17-financial-integrity.md) | on demand | Money arithmetic, double-entry, periods and close, tax, audit trail, retention, segregation of duties, AI in finance |
 | [18-text-hygiene-and-provenance.md](.agents/rules/18-text-hygiene-and-provenance.md) | on demand | Text hygiene |
-| [19-agentic-delivery-and-review.md](.agents/rules/19-agentic-delivery-and-review.md), [20-reverse-engineering.md](.agents/rules/20-reverse-engineering.md), [21-secret-scanning.md](.agents/rules/21-secret-scanning.md) | on demand | Agent loops and AI review; authorized artifact analysis; secret scanning, leaks |
+| [19-agentic-delivery-and-review.md](.agents/rules/19-agentic-delivery-and-review.md) | on demand | Agent loops, worktrees, AI code review |
+| [20-reverse-engineering.md](.agents/rules/20-reverse-engineering.md) | on demand | Authorized artifact analysis, release audits |
+| [21-secret-scanning.md](.agents/rules/21-secret-scanning.md) | on demand | Secret scanning, push protection, leaked secrets |
 
-## 5. Skills index: pick the procedure for the task
+## 5. Skills: pick the procedure for the task
 
-| Phase | Skills | Use them when |
-| :--- | :--- | :--- |
-| Specify | [feature-specification](.agents/skills/feature-specification/SKILL.md) | Goals, acceptance criteria, a plan and ordered tasks before coding |
-| Discover | [ux-research-and-strategy](.agents/skills/ux-research-and-strategy/SKILL.md) | Briefs, research, personas, journeys, information architecture |
-| Architect | [software-architecture](.agents/skills/software-architecture/SKILL.md) | System design, quality attributes, distributed-systems trade-offs, ADRs |
-| Design | [ui-design-and-prototyping](.agents/skills/ui-design-and-prototyping/SKILL.md), [graphic-design-production](.agents/skills/graphic-design-production/SKILL.md), [motion-and-interaction](.agents/skills/motion-and-interaction/SKILL.md), [data-visualization-design](.agents/skills/data-visualization-design/SKILL.md) | Wireframes, mockups, brand, print, animation, charts |
-| Media | [motion-graphics-and-animation](.agents/skills/motion-graphics-and-animation/SKILL.md), [video-editing-and-post-production](.agents/skills/video-editing-and-post-production/SKILL.md), [color-grading-and-color-management](.agents/skills/color-grading-and-color-management/SKILL.md), [photo-editing-and-retouching](.agents/skills/photo-editing-and-retouching/SKILL.md) | Motion graphics, video, colour, photo retouching |
-| System and handoff | [design-system-and-tokens](.agents/skills/design-system-and-tokens/SKILL.md), [design-to-code-handoff](.agents/skills/design-to-code-handoff/SKILL.md), [ai-design-and-artifacts](.agents/skills/ai-design-and-artifacts/SKILL.md), [figma-integration](.agents/skills/figma-integration/SKILL.md) | Tokens, component libraries, design to code, AI-generated designs |
-| Start | [project-bootstrap](.agents/skills/project-bootstrap/SKILL.md) | Creating a repository: runtime, toolchain, editor extensions, CI, docs |
-| Build web | [frontend-from-scratch](.agents/skills/frontend-from-scratch/SKILL.md), [framework-frontend-engineering](.agents/skills/framework-frontend-engineering/SKILL.md), [web-frontend-engineering](.agents/skills/web-frontend-engineering/SKILL.md), [css-architecture-and-responsive](.agents/skills/css-architecture-and-responsive/SKILL.md), [web-integrations-and-platforms](.agents/skills/web-integrations-and-platforms/SKILL.md) | Pages and apps, frameworks, browser security, CSS and themes, CMS, payments, PWA, SEO |
-| Build back end | [native-from-scratch](.agents/skills/native-from-scratch/SKILL.md), [backend-engineering](.agents/skills/backend-engineering/SKILL.md), [api-integration](.agents/skills/api-integration/SKILL.md) | Services and CLIs standard library first; REST/GraphQL/gRPC, databases, queues, jobs; third-party APIs, OAuth, webhooks, payments |
-| Build mobile | [mobile-engineering](.agents/skills/mobile-engineering/SKILL.md) | iOS, Android, Flutter, React Native: platform design, accessibility, security, store release |
-| Data and AI | [data-engineering](.agents/skills/data-engineering/SKILL.md), [data-analysis](.agents/skills/data-analysis/SKILL.md), [machine-learning](.agents/skills/machine-learning/SKILL.md), [llm-applications](.agents/skills/llm-applications/SKILL.md), [rag-systems](.agents/skills/rag-systems/SKILL.md), [ai-agent-systems](.agents/skills/ai-agent-systems/SKILL.md), [computer-vision](.agents/skills/computer-vision/SKILL.md), [ml-inference-serving](.agents/skills/ml-inference-serving/SKILL.md) | Pipelines, analysis, ML, LLM features and evals, retrieval, agents, OCR, model serving |
-| Integrate | [mcp-servers-and-integrations](.agents/skills/mcp-servers-and-integrations/SKILL.md) | Choosing, vetting, configuring and securing MCP servers; databases via MCP Toolbox |
-| Finance | [finance-reporting-systems](.agents/skills/finance-reporting-systems/SKILL.md) | Ledger, chart of accounts, monthly income and expense reports, statements, tax, close, audit trail, AI and speech input for finance |
-| Change | [change-existing-code](.agents/skills/change-existing-code/SKILL.md) | Modifying, refactoring, upgrading or migrating existing code |
-| Test | [test-engineering](.agents/skills/test-engineering/SKILL.md), [quality-assurance](.agents/skills/quality-assurance/SKILL.md), [frontend-testing-and-visual-qa](.agents/skills/frontend-testing-and-visual-qa/SKILL.md), [accessibility-audit](.agents/skills/accessibility-audit/SKILL.md) | Unit, regression, load, contract, end-to-end, visual and WCAG tests |
-| Tune and prove | [web-performance-optimization](.agents/skills/web-performance-optimization/SKILL.md), [resilience-and-chaos-engineering](.agents/skills/resilience-and-chaos-engineering/SKILL.md), [chaos-engineering](.agents/skills/chaos-engineering/SKILL.md) | Core Web Vitals; failure modes, SLOs and error budgets; fault-injection experiments and game days |
-| Debug | [systematic-debugging](.agents/skills/systematic-debugging/SKILL.md) | Errors, crashes, wrong output, slowness, incidents |
-| Review | [rigorous-code-audit](.agents/skills/rigorous-code-audit/SKILL.md), [design-critique-and-review](.agents/skills/design-critique-and-review/SKILL.md), [anti-slop](.agents/skills/anti-slop/SKILL.md), [anti-slop-filter](.agents/skills/anti-slop-filter/SKILL.md) | Diffs and codebases; designs; generic AI patterns in code, docs, comments, UI and copy |
-| Agents | [agent-delivery-loop](.agents/skills/agent-delivery-loop/SKILL.md), [git-worktrees](.agents/skills/git-worktrees/SKILL.md), [coderabbit-review](.agents/skills/coderabbit-review/SKILL.md) | Long, parallel or unattended agent work; CodeRabbit reviews |
-| Text hygiene | [content-hygiene](.agents/skills/content-hygiene/SKILL.md), [clean-user-facing-text](.agents/skills/clean-user-facing-text/SKILL.md), [remove-ai-marks](.agents/skills/remove-ai-marks/SKILL.md) | Hidden Unicode, metadata |
-| Secure | [security-hardening](.agents/skills/security-hardening/SKILL.md), [security-vulnerability-audit](.agents/skills/security-vulnerability-audit/SKILL.md), [reverse-engineering](.agents/skills/reverse-engineering/SKILL.md), [secret-scanning](.agents/skills/secret-scanning/SKILL.md) | Threat modelling, hardening, scanning, secrets; audits with verified, impact-rated findings |
-| Document | [project-documentation](.agents/skills/project-documentation/SKILL.md), [technical-documentation](.agents/skills/technical-documentation/SKILL.md) | The complete docs/ set; READMEs, API and configuration reference, ADRs, runbooks |
-| Automate and ship | [ci-cd-pipeline](.agents/skills/ci-cd-pipeline/SKILL.md), [frontend-deployment](.agents/skills/frontend-deployment/SKILL.md), [deploy-and-release](.agents/skills/deploy-and-release/SKILL.md) | CI, releases, hosting, containers, migrations, rollout, rollback |
-| Operate | [cloud-infrastructure](.agents/skills/cloud-infrastructure/SKILL.md), [it-operations](.agents/skills/it-operations/SKILL.md) | IaC, Kubernetes, IAM, networking, SLOs, DR, cost; identity and SSO, endpoints, backup, ITSM |
-| Any tool | [technology-adoption](.agents/skills/technology-adoption/SKILL.md) | Any language, framework, library, platform or SaaS no other skill covers |
+Skills are step-by-step procedures in [`.agents/skills/`](.agents/skills/). Tools that support Agent Skills (Claude Code, Codex, Gemini CLI, Antigravity, Cursor and others) load each skill's name and description and open the body when a task matches. **Any other tool: read the [skills index](.agents/SKILLS.md) and open the matching skill before starting that kind of work.**
 
-Paired skills: `anti-slop` (code, docs) and `anti-slop-filter` (UI, copy); `chaos-engineering` (experiments) and `resilience-and-chaos-engineering` (SLOs, browser chaos); `technical-documentation` and `project-documentation` (one docs/ set). Use both when needed.
+- **Phases**: specify, discover, architect, design, media, design system and handoff, start, build (web, back end, mobile), data and AI, integrate (MCP), finance, change, test, tune and prove, debug, review (code, design, anti-slop), agents (delivery loops, worktrees, CodeRabbit), text hygiene, secure (hardening, vulnerability audit, shipped artifacts, secrets), document, automate and ship, operate, any tool.
 
 A task often spans several skills: a designed page uses handoff, CSS, accessibility audit, testing, then review.
 

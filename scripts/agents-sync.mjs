@@ -37,6 +37,9 @@ const RULE_MAX_CHARS = 12_000;
 const AGENTS_MD_MAX_LINES = 200;
 // Antigravity budgets 20,000 tokens for always-on rules; estimate tokens as characters / 4.
 const ALWAYS_ON_TOKEN_BUDGET = 20_000;
+// Warn early, so that the next addition is planned with a matching cut instead of discovered over budget.
+const ALWAYS_ON_WARN_RATIO = 0.95;
+const SKILLS_INDEX = ".agents/SKILLS.md";
 const LEGACY_FILES = [".cursorrules", ".windsurfrules"];
 
 const errors = [];
@@ -335,20 +338,51 @@ async function validateRules() {
   return { alwaysOnChars, alwaysOnFiles, ruleFiles };
 }
 
-/** AGENTS.md is the router for tools that do not load .agents/ natively, so it must link every rule and skill. */
+/**
+ * AGENTS.md is the router for tools that do not load .agents/ natively, so it must link every rule. Skills are
+ * linked either from AGENTS.md or from the skills index .agents/SKILLS.md, which AGENTS.md must then link; tools
+ * that support Agent Skills load skill names and descriptions themselves, so the index stays out of the always-on
+ * context. When the index exists it must list every skill and nothing else. Pure.
+ */
+export function indexProblems({ agentsText, skillsIndexText, rulePaths, skillNames }) {
+  const problems = rulePaths
+    .filter((rulePath) => !agentsText.includes(`(${rulePath})`))
+    .map((rulePath) => `AGENTS.md does not link rule ${rulePath}; add it to the rules index`);
+  if (typeof skillsIndexText !== "string") {
+    const unlinked = skillNames.filter((name) => !agentsText.includes(`(.agents/skills/${name}/SKILL.md)`));
+    return [
+      ...problems,
+      ...unlinked.map((name) => `AGENTS.md does not link skill "${name}"; add it to the skills index`),
+    ];
+  }
+  return [...problems, ...skillsIndexProblems(agentsText, skillsIndexText, skillNames)];
+}
+
+function skillsIndexProblems(agentsText, skillsIndexText, skillNames) {
+  const problems = agentsText.includes(`(${SKILLS_INDEX})`)
+    ? []
+    : [`AGENTS.md does not link the skills index ${SKILLS_INDEX}`];
+  const listed = [...skillsIndexText.matchAll(/\(skills\/([^/)]+)\/SKILL\.md\)/g)].map((match) => match[1]);
+  for (const name of skillNames.filter((skill) => !listed.includes(skill))) {
+    problems.push(`${SKILLS_INDEX} does not list skill "${name}"; add it to the index`);
+  }
+  for (const name of listed.filter((skill) => !skillNames.includes(skill))) {
+    problems.push(`${SKILLS_INDEX} lists "${name}", which is not a skill in .agents/skills`);
+  }
+  return problems;
+}
+
 async function validateIndex(ruleFiles, skillNames) {
   const agentsFile = path.join(ROOT, "AGENTS.md");
   if (!existsSync(agentsFile)) return;
-  const agentsText = await readFile(agentsFile, "utf8");
-  for (const file of ruleFiles) {
-    const link = `(${path.relative(ROOT, file).split(path.sep).join("/")})`;
-    if (!agentsText.includes(link)) fail(agentsFile, `does not link rule ${relative(file)}; add it to the rules index`);
-  }
-  for (const name of skillNames) {
-    if (!agentsText.includes(`(.agents/skills/${name}/SKILL.md)`)) {
-      fail(agentsFile, `does not link skill "${name}"; add it to the skills index`);
-    }
-  }
+  const indexFile = path.join(ROOT, SKILLS_INDEX);
+  const problems = indexProblems({
+    agentsText: await readFile(agentsFile, "utf8"),
+    skillsIndexText: existsSync(indexFile) ? await readFile(indexFile, "utf8") : undefined,
+    rulePaths: ruleFiles.map((file) => path.relative(ROOT, file).split(path.sep).join("/")),
+    skillNames,
+  });
+  for (const message of problems) fail(message.startsWith(SKILLS_INDEX) ? indexFile : agentsFile, message);
 }
 
 /** Claude Code reads CLAUDE.md instead of AGENTS.md, so CLAUDE.md should import AGENTS.md and the always-on rules. */
@@ -383,8 +417,16 @@ async function validateAlwaysOnBudget({ alwaysOnChars: alwaysOnRuleChars }) {
   const estimatedTokens = Math.round((agentsText.length + alwaysOnRuleChars) / 4);
   if (estimatedTokens > ALWAYS_ON_TOKEN_BUDGET) {
     warn(agentsFile, `always-on context is about ${estimatedTokens} tokens; budget is ${ALWAYS_ON_TOKEN_BUDGET}`);
+  } else if (estimatedTokens > ALWAYS_ON_TOKEN_BUDGET * ALWAYS_ON_WARN_RATIO) {
+    warn(
+      agentsFile,
+      `always-on context is about ${estimatedTokens} tokens, within 5% of the ${ALWAYS_ON_TOKEN_BUDGET} budget; plan a matching cut before adding`,
+    );
   }
-  console.log(`always-on context: AGENTS.md ${lineCount} lines, about ${estimatedTokens} tokens with always_on rules`);
+  const headroom = ALWAYS_ON_TOKEN_BUDGET - estimatedTokens;
+  console.log(
+    `always-on context: AGENTS.md ${lineCount} lines, about ${estimatedTokens} tokens with always_on rules (headroom ${headroom})`,
+  );
 }
 
 async function markdownFiles(directory) {

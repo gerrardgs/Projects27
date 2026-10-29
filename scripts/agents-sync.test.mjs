@@ -2,7 +2,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { parseFrontmatter, ruleFrontmatterProblems, skillFrontmatterProblems } from "./agents-sync.mjs";
+import { indexProblems, parseFrontmatter, ruleFrontmatterProblems, skillFrontmatterProblems } from "./agents-sync.mjs";
 
 test("parses scalars, quoted values and folded block scalars", () => {
   const { data, body } = parseFrontmatter(
@@ -96,4 +96,40 @@ test("rule frontmatter: requires a known trigger and what each trigger needs", (
   assert.match(ruleFrontmatterProblems({ trigger: "sometimes" })[0], /needs frontmatter "trigger/);
   assert.deepEqual(ruleFrontmatterProblems({ trigger: "model_decision" }), ["model_decision rules need a description"]);
   assert.deepEqual(ruleFrontmatterProblems({ trigger: "glob" }), ["glob rules need globs"]);
+});
+
+test("indexProblems: skills may be linked from AGENTS.md or from a complete skills index that AGENTS.md links", () => {
+  const rulePaths = [".agents/rules/01-core.md"];
+  const agentsWithRule = "[01](.agents/rules/01-core.md)";
+  const base = { rulePaths, skillNames: ["alpha", "beta"] };
+  assert.deepEqual(
+    indexProblems({
+      ...base,
+      agentsText: `${agentsWithRule} [a](.agents/skills/alpha/SKILL.md) [b](.agents/skills/beta/SKILL.md)`,
+    }),
+    [],
+  );
+  const index = "[a](skills/alpha/SKILL.md) [b](skills/beta/SKILL.md)";
+  assert.deepEqual(
+    indexProblems({ ...base, agentsText: `${agentsWithRule} [index](.agents/SKILLS.md)`, skillsIndexText: index }),
+    [],
+  );
+  assert.deepEqual(indexProblems({ ...base, agentsText: agentsWithRule, skillsIndexText: index }), [
+    "AGENTS.md does not link the skills index .agents/SKILLS.md",
+  ]);
+  assert.deepEqual(
+    indexProblems({
+      ...base,
+      agentsText: `${agentsWithRule} (.agents/SKILLS.md)`,
+      skillsIndexText: "[a](skills/alpha/SKILL.md) [g](skills/gone/SKILL.md)",
+    }),
+    [
+      '.agents/SKILLS.md does not list skill "beta"; add it to the index',
+      '.agents/SKILLS.md lists "gone", which is not a skill in .agents/skills',
+    ],
+  );
+  assert.deepEqual(indexProblems({ ...base, agentsText: "[a](.agents/skills/alpha/SKILL.md)" }), [
+    "AGENTS.md does not link rule .agents/rules/01-core.md; add it to the rules index",
+    'AGENTS.md does not link skill "beta"; add it to the skills index',
+  ]);
 });

@@ -82,7 +82,7 @@ Where a tool does not load `.agents/rules/` itself, the indexes in `AGENTS.md` t
 3. **Skill validation**: frontmatter per the Agent Skills specification (name format and length, name matches folder, description length, body under 500 lines).
 4. **Rule validation**: a valid `trigger` (Antigravity silently drops rules without one), a description for `model_decision` rules, and at most 12,000 characters (Windsurf's per-file limit, the strictest of the tools).
 5. **Strict YAML**: rejects frontmatter that real YAML parsers would reject or read differently, such as an unquoted value containing `: `.
-6. **Consistency**: `AGENTS.md` must link every rule and skill; `CLAUDE.md` must import `AGENTS.md` and should import every always-on rule.
+6. **Consistency**: `AGENTS.md` must link every rule and the skills index `.agents/SKILLS.md`, and the index must list every skill; `CLAUDE.md` must import `AGENTS.md` and should import every always-on rule.
 7. **Links**: every relative link in the spec files must resolve; `file://` links are rejected. `--all-markdown` extends the check to every Markdown file in the repository.
 
 ## 5. Design decisions
