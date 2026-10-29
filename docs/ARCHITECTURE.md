@@ -2,7 +2,11 @@
 
 Status: stage 2 implemented in `apps/api` on 2026-10-28; later stages proposed. Decisions marked "ADR" get a decision record in `docs/adr/` when the stage that implements them starts ([ROADMAP.md](ROADMAP.md)). Versions were checked on 2026-10-28 with `node scripts/tech-lookup.mjs` (endoflife.date and the npm registry).
 
-## 1. Shape
+## Overview
+
+Projects 27 is a finance reporting system for monthly income and expense reports and financial statements. Today it serves one personal entity per user in IDR. It has four parts: a Node.js API over PostgreSQL that owns the ledger and every rule about money, and three clients that call it through one OpenAPI contract (a web app, an iOS app and an Android app). Each client keeps a device copy, so it works when the server is down. Speech is recognised on the device; the API turns the sentence into a form that the person checks and saves. The sections below describe the target design. "Implemented" marks what runs today, and [Known limitations and technical debt](#known-limitations-and-technical-debt) lists the gap.
+
+## System context
 
 A modular monolith: one deployable web application with clear internal modules, one PostgreSQL database, a job worker and a self-hosted speech service. It is the simplest structure that meets the requirements; modules can be split out later if load or team size requires it ([software-architecture](../.agents/skills/software-architecture/SKILL.md)).
 
@@ -23,7 +27,20 @@ flowchart LR
   API --> TAX[Tax export for PJAP / Coretax]
 ```
 
-## 2. Modules
+## Containers and components
+
+Implemented containers (2026-10-29):
+
+| Container | Code | Technology | Talks to |
+| :--- | :--- | :--- | :--- |
+| Core API | `apps/api` | Node.js 24 standard library HTTP server, `pg`, `@anthropic-ai/sdk` | PostgreSQL; Claude API (optional) |
+| Database | `apps/api/migrations` | PostgreSQL 18: tables, constraint triggers, hash-chained audit | Core API only |
+| Web app | `apps/web` | React 19, Vite 8, IndexedDB, service worker | Core API through same-origin `/v1` |
+| Android app | `apps/android` | Flutter 3.47, SQLite (`sqflite`), Keystore (`flutter_secure_storage`) | Core API over HTTPS with a bearer token |
+| iOS app | `apps/ios` | SwiftUI, `KeuanganCore` package, SQLite, Keychain | Core API over HTTPS with a bearer token |
+| Contract | `packages/contract` | OpenAPI 3.1, shared sample ledger | Checked by the API's contract tests |
+
+Target modules inside the API (the design; the ledger, identity, reporting, close, imports, capture and audit modules exist today):
 
 | Module | Responsibility | Owns tables |
 | :--- | :--- | :--- |
@@ -41,7 +58,38 @@ flowchart LR
 
 Modules call each other through their public functions only; the reporting module reads ledger data through views, never by writing.
 
-## 3. Technology choices
+## Data flow
+
+**Capture by voice.** The device recognises Indonesian speech (Web Speech API, Android SpeechRecognizer, Apple Speech) → the client sends the sentence to `POST .../capture/parse` → the API runs the rule parser and, when configured, Claude, validates each field against the entity's accounts and dates, and records a draft row (method and fields, never the sentence) → the client fills the form → the person presses Simpan → `POST .../transactions` posts a balanced entry and writes an audit event → the client sends which filled fields were changed (`.../capture/{draftId}/review`).
+
+**Reports.** A client asks for `GET .../reports/{kind}` → the API computes from posted lines and returns the figures with self-checks → closing a month stores snapshots with a SHA-256 content hash → Excel exports carry that hash, so a recipient can check a file against the snapshot.
+
+**Offline.** Every successful GET is stored on the device → when the API cannot be reached, the client shows the stored copy and the time it was saved → a transaction saved then goes to the outbox with its idempotency key → the outbox is sent oldest first when the server is back; the server's idempotency check makes a repeated send harmless.
+
+**Imports.** File (CSV or XLSX, up to 8 MiB) → `inspect` (columns) → `preview` (per-row validation, duplicate detection by a stable key) → `commit` (posts valid rows once).
+
+## Trust boundaries
+
+| Boundary | What crosses | Controls |
+| :--- | :--- | :--- |
+| Internet → API | Requests from browsers and apps | TLS (in production), session cookie (`HttpOnly`, `SameSite=Lax`, `Secure`) with an Origin check on writes, or bearer token; body limits (1 MiB, 8 MiB for imports); rate limits on sign-in (10 per minute per address) and capture (30 per minute per user); security headers |
+| API → database | SQL | Parameterised queries only; balance, immutability and closed-period rules enforced by triggers, so a bug in the API cannot break them |
+| API → Claude API | One sentence and the account list | Sent only when `ANTHROPIC_API_KEY` is set; the sentence is treated as data, with strict tool use; output validated field by field; never stored |
+| Device ↔ person | Speech, device copy | Speech recognition by the platform (Google or Apple services); device copy in the app's private storage, cleared at sign-out |
+| Repository → CI | Code, dependencies | gitleaks, authorship check, CodeQL, pinned actions, Dependabot |
+
+## Quality attributes
+
+| Attribute | How the design meets it | Evidence |
+| :--- | :--- | :--- |
+| Correctness of money | Integer minor units, DB-enforced balance and immutability, report self-checks | API tests (60), shared fixture with hand-checked totals |
+| Auditability | Hash-chained audit events, snapshots with content hashes | `GET .../audit/verify`; ledger tests break the chain on purpose |
+| Availability for users | Device copy and outbox on all clients; service worker for the web app | Playwright, emulator and XCUITest offline tests |
+| Accessibility | Semantic HTML, keyboard paths, live regions, VoiceOver and TalkBack labels | axe-core in every end-to-end test |
+| Security | Argon2id, TOTP, revocable sessions, least data to AI | Security-relevant tests in `apps/api/test` |
+| Evaluated AI | Labelled corpus, gates, real-use quality | [EVALUATION.md](EVALUATION.md) |
+
+## Key decisions
 
 | Concern | Choice | Reason |
 | :--- | :--- | :--- |
@@ -61,7 +109,7 @@ Modules call each other through their public functions only; the reporting modul
 
 Every library is adopted through [04-dependencies](../.agents/rules/04-dependencies.md) section 9 with its version pinned in the lockfile.
 
-## 4. Data integrity design
+## Data integrity design
 
 - Money: `amount_minor BIGINT` plus `currency CHAR(3)`; the minor-unit exponent per currency is stored in `currencies`.
 - Balance: a deferred constraint trigger on `journal_lines` rejects a transaction in which a posted entry does not balance in the functional currency.
@@ -70,7 +118,7 @@ Every library is adopted through [04-dependencies](../.agents/rules/04-dependenc
 - Audit chain: `audit_events.hash = SHA-256(previous_hash || canonical_json(event))`; a scheduled job verifies the chain and alerts on a break.
 - Reports: `report_runs` store parameters and the framework version; `report_snapshots` store results and a content hash; exports read from snapshots.
 
-## 5. Security design
+## Security design
 
 - Authentication (implemented): email and password hashed with Argon2id, optional TOTP second factor with an encrypted seed, random session tokens stored as SHA-256 hashes and revocable; web sessions in `Secure`, `HttpOnly`, `SameSite=Lax` cookies with an Origin check on writes, native sessions as bearer tokens. Planned: passkeys once the domain is fixed, OpenID Connect single sign-on for company entities, re-authentication for approvals, bank-detail changes and period reopen.
 - Authorization in one policy module, deny by default, tested per role and entity.
@@ -79,6 +127,17 @@ Every library is adopted through [04-dependencies](../.agents/rules/04-dependenc
 - Prompt-injection defence: uploaded documents and bank descriptions are data; the assistant's tools are read-only and scoped to the user ([06-security](../.agents/rules/06-security.md) section 7).
 - Device copy (implemented). So that the apps keep working when the API or the hosting is down, each client keeps the last answer to every GET and an outbox of transactions saved while offline: IndexedDB in the browser, SQLite in the app's private storage on Android, and SQLite with file protection until first unlock on iOS. The copy holds the signed-in person's financial data at rest on the device. It is cleared at sign-out, and the apps ask first when transactions are still waiting. It is not encrypted beyond the platform's own storage protection. The server stays the source of truth: queued transactions keep their idempotency keys, go through the same validation and period rules when sent, and a refusal is shown, never retried silently.
 
-## 6. Deployment
+## Deployment view
 
 Container images built once in CI, deployed to a staging and a production environment in an Indonesian cloud region, managed PostgreSQL with point-in-time recovery, daily restore test in staging, and monitoring of posting errors, job failures, AI error rates and the audit-chain check. Details in stage 6 of the [roadmap](ROADMAP.md).
+
+## Known limitations and technical debt
+
+Checked against the code on 2026-10-29:
+
+- **Designed, not built yet**: row-level security policies and a separate database role without `UPDATE` or `DELETE` (today immutability is enforced by triggers, which the application role could drop); object storage for documents; the self-hosted Whisper speech service; the job worker; email and chat delivery; OpenID Connect and passkeys; budgets, banking reconciliation, tax codes and dimensions.
+- **Rate limits are in memory**: they reset on restart and do not work across several instances.
+- **CI covers the API and the web app only**: the Android and iOS apps are tested on a developer machine (Flutter tests, emulator integration test, `keuangan-check`, XCUITest), not in CI.
+- **Device copy is not encrypted beyond the platform's own protection**, and it is shared by everyone who uses the same browser profile until sign-out.
+- **AI capture has not been measured with a real model**: no API key is configured ([EVALUATION.md](EVALUATION.md) section 7).
+- **One entity per user**: company entities, approval screens and multi-currency postings exist only in the schema and API.

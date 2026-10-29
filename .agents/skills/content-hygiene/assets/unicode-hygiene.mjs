@@ -21,8 +21,32 @@ import { extname, join } from "node:path";
 import { parseArgs } from "node:util";
 
 const CODE_EXTENSIONS = new Set([
-  ".js", ".mjs", ".cjs", ".ts", ".tsx", ".jsx", ".json", ".py", ".go", ".rs", ".java", ".kt", ".swift",
-  ".dart", ".c", ".h", ".cpp", ".cs", ".rb", ".php", ".sh", ".sql", ".yml", ".yaml", ".toml", ".css",
+  ".js",
+  ".mjs",
+  ".cjs",
+  ".ts",
+  ".tsx",
+  ".jsx",
+  ".json",
+  ".py",
+  ".go",
+  ".rs",
+  ".java",
+  ".kt",
+  ".swift",
+  ".dart",
+  ".c",
+  ".h",
+  ".cpp",
+  ".cs",
+  ".rb",
+  ".php",
+  ".sh",
+  ".sql",
+  ".yml",
+  ".yaml",
+  ".toml",
+  ".css",
 ]);
 const SKIP_DIRECTORIES = new Set(["node_modules", ".git", "dist", "build", ".build", ".dart_tool"]);
 
@@ -66,23 +90,37 @@ const isEmoji = (ch) => ch !== undefined && /\p{Extended_Pictographic}|\p{Emoji_
 // Scripts that use the joiners in ordinary words (Arabic, Persian, Indic, Sinhala, Khmer and others).
 const isJoiningScript = (ch) => ch !== undefined && /\p{L}|\p{M}/u.test(ch) && !/\p{Script=Latin}/u.test(ch);
 
+/** A tag sequence after a black flag spells a subdivision flag (for example Scotland). */
+function isFlagTag(chars, index) {
+  for (let i = index - 1; i >= 0; i -= 1) {
+    const cp = chars[i].codePointAt(0);
+    if (!isTag(cp)) return cp === 0x1f3f4;
+  }
+  return false;
+}
+
+/** A joiner stays inside emoji sequences and in scripts that join letters with it. */
+function classifyJoiner(cp, before, after) {
+  if (cp === 0x200d) return (isEmoji(before) && isEmoji(after)) || isJoiningScript(before) ? null : "remove";
+  return isJoiningScript(before) || isJoiningScript(after) ? null : "remove";
+}
+
+/** Joiners, the byte-order mark and variation selectors are kept only where they do something. */
+function classifyInContext(cp, chars, index) {
+  const before = chars[index - 1];
+  if (cp === 0xfeff) return index === 0 ? null : "remove";
+  if (cp === 0x200d || cp === 0x200c) return classifyJoiner(cp, before, chars[index + 1]);
+  if (!isVariationSelector(cp)) return null;
+  return isEmoji(before) || /\p{Script=Han}/u.test(before ?? "") ? null : "review";
+}
+
 function classify(chars, index) {
   const cp = chars[index].codePointAt(0);
-  const before = chars[index - 1];
-  const after = chars[index + 1];
-  if (isTag(cp)) {
-    // A tag sequence after a black flag spells a subdivision flag (for example Scotland); keep those.
-    const flagSequence = chars.slice(0, index).reverse().find((c) => !isTag(c.codePointAt(0))) === "\u{1F3F4}";
-    return flagSequence ? null : "remove";
-  }
+  if (isTag(cp)) return isFlagTag(chars, index) ? null : "remove";
   if (ALWAYS_REMOVE.has(cp)) return "remove";
-  if (cp === 0xfeff) return index === 0 ? null : "remove";
-  if (cp === 0x200d) return (isEmoji(before) && isEmoji(after)) || isJoiningScript(before) ? null : "remove";
-  if (cp === 0x200c) return isJoiningScript(before) || isJoiningScript(after) ? null : "remove";
   if (BIDI.has(cp)) return "bidi";
   if (REVIEW.has(cp)) return "review";
-  if (isVariationSelector(cp)) return isEmoji(before) || /\p{Script=Han}/u.test(before ?? "") ? null : "review";
-  return null;
+  return classifyInContext(cp, chars, index);
 }
 
 const label = (cp) =>
@@ -124,6 +162,19 @@ function* files(path) {
   }
 }
 
+const describe = (f) =>
+  `${f.path}:${f.line}:${f.column} ${f.name} ${f.error ? "error (bidi control in code)" : f.kind}${f.fixed ? " (removed)" : ""}`;
+
+/** Scans one file, fixing it when asked; returns its findings with the path. Binary files are skipped. */
+function scanFile(path, fix) {
+  const bytes = readFileSync(path);
+  if (bytes.includes(0)) return [];
+  const { findings, fixed } = scanText(bytes.toString("utf8"), { code: CODE_EXTENSIONS.has(extname(path)) });
+  const removable = findings.some((f) => f.kind === "remove");
+  if (fix && removable) writeFileSync(path, fixed);
+  return findings.map((f) => ({ path, ...f, fixed: fix && f.kind === "remove" }));
+}
+
 function main() {
   const { values, positionals } = parseArgs({
     allowPositionals: true,
@@ -133,28 +184,11 @@ function main() {
     process.stderr.write("usage: node unicode-hygiene.mjs [--fix] [--json] <file or directory>...\n");
     process.exit(2);
   }
-  const report = [];
-  let failing = false;
-  for (const path of positionals.flatMap((p) => [...files(p)])) {
-    const bytes = readFileSync(path);
-    if (bytes.includes(0)) continue; // binary
-    const text = bytes.toString("utf8");
-    const { findings, fixed } = scanText(text, { code: CODE_EXTENSIONS.has(extname(path)) });
-    if (findings.length === 0) continue;
-    const removed = findings.filter((f) => f.kind === "remove").length;
-    if (values.fix && removed > 0) writeFileSync(path, fixed);
-    for (const f of findings) {
-      const fixedHere = values.fix && f.kind === "remove";
-      if ((f.kind === "remove" && !fixedHere) || f.error) failing = true;
-      report.push({ path, ...f, fixed: fixedHere });
-      if (!values.json)
-        process.stdout.write(
-          `${path}:${f.line}:${f.column} ${f.name} ${f.error ? "error (bidi control in code)" : f.kind}${fixedHere ? " (removed)" : ""}\n`,
-        );
-    }
-  }
+  const report = positionals.flatMap((p) => [...files(p)]).flatMap((path) => scanFile(path, values.fix));
   if (values.json) process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
   else if (report.length === 0) process.stdout.write("no invisible or bidirectional characters found\n");
+  else process.stdout.write(`${report.map(describe).join("\n")}\n`);
+  const failing = report.some((f) => (f.kind === "remove" && !f.fixed) || f.error);
   process.exitCode = failing ? 1 : 0;
 }
 

@@ -1,8 +1,8 @@
 # Product requirements: enterprise finance reporting system
 
-Status: updated with the owner's decisions of 2026-10-28 (section 8). Sources for every regulatory statement are in [RESEARCH.md](RESEARCH.md); delivery stages are in [ROADMAP.md](ROADMAP.md).
+Status: updated with the owner's decisions of 2026-10-28 ([Owner decisions](#owner-decisions-2026-10-28)). Sources for every regulatory statement are in [RESEARCH.md](RESEARCH.md); delivery stages are in [ROADMAP.md](ROADMAP.md).
 
-## 1. Problem
+## Problem
 
 Companies that record income and expenses in spreadsheets, chat messages and paper receipts face the same failures every month:
 
@@ -19,7 +19,9 @@ Companies that record income and expenses in spreadsheets, chat messages and pap
 | Records lost or deleted | Breach of the 10-year retention duty | F8 retention policy and protected storage |
 | Several entities, branches and currencies | Consolidation by copy and paste | F2 multi-entity, dimensions and multi-currency |
 
-## 2. Users and roles
+## Users and scenarios
+
+### Roles
 
 | Role | Does | Cannot |
 | :--- | :--- | :--- |
@@ -31,7 +33,31 @@ Companies that record income and expenses in spreadsheets, chat messages and pap
 | Auditor | Read everything including the audit trail, export evidence | Change data |
 | Administrator | Manage users, roles, entities, integrations | Post or approve financial entries |
 
-## 3. Functional requirements
+### Scenarios
+
+| Scenario | Who | Today (2026-10-29) |
+| :--- | :--- | :--- |
+| Records lunch by saying "beli nasi padang 35 ribu pakai GoPay kemarin" on the phone, checks the filled form, presses Simpan | Individual owner (personal entity) | Implemented on web, Android and iOS |
+| Records a transaction in the basement car park without signal; it is sent when the phone is back online | Individual owner | Implemented: device copy and outbox on all three apps |
+| Imports last month's bank statement (CSV or XLSX), reviews duplicates and errors, commits | Individual owner, accountant | Implemented on the web |
+| Closes October, downloads the recap in Excel, and later checks that its hash matches the snapshot | Owner, controller | Implemented on the web (close, snapshots, Excel with hash); sending by email or chat is stage 6 |
+| Reverses a wrong entry with a reason instead of editing it | Accountant | Implemented (API and web) |
+| Approves an entry prepared by someone else; cannot approve their own | Approver in a company entity | Implemented in the API; company entities and the approval screen come later |
+
+## Goals and non-goals
+
+### Goals
+
+- Every month's income and expenses recorded completely and on time, because capture takes seconds and works by voice.
+- Reports that people trust: exact amounts, balanced books, immutable postings, closed periods, a verifiable audit trail.
+- One ledger, three clients (web, iOS, Android), one contract.
+- AI that saves typing but never decides: every AI output is a proposal a person reviews.
+
+### Non-goals: out of scope for the first release
+
+Payroll calculation, filing tax returns directly with DJP, payments execution to banks, inventory costing and fixed-asset subledgers. Each can integrate later through adapters.
+
+## Requirements
 
 - **F1 Capture**: record an income or expense in under 30 seconds by voice (Indonesian and English, including mixed speech), photo or PDF of a receipt, short text, or a full form. The user always reviews the extracted fields before saving a draft.
 - **F2 Structure**: multiple legal entities, chart of accounts per entity from templates, dimensions (cost centre, department, project, branch), multiple currencies with stored exchange rates.
@@ -47,7 +73,7 @@ Companies that record income and expenses in spreadsheets, chat messages and pap
 - **F12 Budgets**: annual and monthly budgets with versions, variance thresholds and explanations.
 - **F13 Dashboards**: cash position, income and expense trend, budget burn, outstanding approvals, close progress; accessible charts with data tables.
 
-## 4. Non-functional requirements
+## Non-functional requirements
 
 | Area | Requirement | Measured by |
 | :--- | :--- | :--- |
@@ -60,7 +86,7 @@ Companies that record income and expenses in spreadsheets, chat messages and pap
 | Retention | 10 years for books and source documents of Indonesian taxpayers | Retention job tests, storage policy |
 | Language | Indonesian and English interface; amounts and dates formatted with `Intl` for the user's locale | i18n tests |
 
-## 5. Clients
+## Clients
 
 Three clients use one API and one contract ([packages/contract/openapi.json](../packages/contract/openapi.json)) and are tested against one sample ledger ([packages/contract/fixtures/personal-sample.json](../packages/contract/fixtures/personal-sample.json)):
 
@@ -72,11 +98,7 @@ Three clients use one API and one contract ([packages/contract/openapi.json](../
 
 Every amount crosses the API as a decimal string; clients parse it with `Decimal` (Swift) or a decimal type (Dart), never binary floating point.
 
-## 6. Out of scope for the first release
-
-Payroll calculation, filing tax returns directly with DJP, payments execution to banks, inventory costing and fixed-asset subledgers. Each can integrate later through adapters.
-
-## 7. Acceptance criteria for the first release
+## Acceptance criteria for the first release
 
 1. A preparer records an expense by voice in Indonesian; the extracted amount, date and account are correct for at least 95 percent of a consented evaluation set, and the user can correct any field before saving.
 2. An approver cannot approve an entry they prepared; the attempt is rejected and logged.
@@ -86,7 +108,33 @@ Payroll calculation, filing tax returns directly with DJP, payments execution to
 6. The AI-drafted narrative contains no number that the report did not compute; a controller approves it before distribution.
 7. axe-core reports no violations on the main journeys; all journeys work with a keyboard only.
 
-## 8. Owner decisions (2026-10-28)
+## Success metrics
+
+| Metric | Target | Source |
+| :--- | :--- | :--- |
+| Capture: amount right on a labelled Indonesian test set | At least 95 percent, with no more than 2 percent silently wrong | `apps/api/eval` gates, checked by `npm test`; 100 percent and 0 percent on 2026-10-28 ([EVALUATION.md](EVALUATION.md)) |
+| Capture in real use: saved forms that needed no correction | Tracked per method (AI or rules) with a 95 percent interval; target set after 100 saved forms | `GET .../capture/quality` |
+| Unbalanced posted entries | Zero | Database constraint triggers; report self-checks |
+| Report self-checks failing on a published report | Zero | `checks` in every report response |
+| Audit chain breaks | Zero | `GET .../audit/verify` |
+| Accessibility violations on main journeys | Zero axe-core violations (WCAG 2.2 AA tags) | Playwright end-to-end tests |
+| Close takes | Under one working day for a personal entity | Measured from first close task to snapshot, from stage 6 |
+
+## Release plan
+
+Delivery is in seven stages ([ROADMAP.md](ROADMAP.md)). Stages 1 to 4 (foundation, core API, web, mobile apps) are done. Stage 5 (AI and speech) is in progress: voice capture, evaluation and real-use quality are done; Whisper, receipts, the ledger assistant, narratives and anomaly flags remain. Stage 6 brings automated recaps by email and chat and PDF export; stage 7 brings hosting and hardening. Each stage is released when its exit criterion in the roadmap is met.
+
+## Open questions
+
+| Question | Needed for | Owner |
+| :--- | :--- | :--- |
+| Hosting provider and region (must keep data in Indonesia) | Stage 7, passkeys (need a domain), email sending | Owner |
+| Claude API key for AI capture, and its monthly budget | Measuring AI mode; ledger assistant and narratives | Owner |
+| Email and chat channels for recaps (which provider, which chat app) | Stage 6 | Owner |
+| Company entities: when, and with which roles and approval thresholds | Approvals screen, multi-entity | Owner |
+| Encryption of the device copy beyond the platform's protection | Offline mode on shared or managed devices | Owner, security review |
+
+## Owner decisions (2026-10-28)
 
 | Question | Decision | Effect |
 | :--- | :--- | :--- |

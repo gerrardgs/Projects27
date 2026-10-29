@@ -77,6 +77,12 @@ jobs:
         run: node --test ".agents/skills/security-hardening/assets/claude-code-guardrails/*.test.mjs"
       - name: Technical documentation checker tests
         run: node --test ".agents/skills/technical-documentation/assets/*.test.mjs"
+      - name: Content hygiene scanner tests
+        run: node --test ".agents/skills/content-hygiene/assets/*.test.mjs"
+      - name: Product documentation set is complete (rule 16)
+        run: node .agents/skills/technical-documentation/assets/check-docs.mjs docs
+      - name: No hidden or bidirectional Unicode in code and documentation
+        run: node .agents/skills/content-hygiene/assets/unicode-hygiene.mjs scripts docs apps/api/src apps/api/test apps/api/eval apps/web/src apps/web/e2e apps/android/lib apps/android/test apps/ios packages AGENTS.md CLAUDE.md README.md SECURITY.md
       - name: Validate rules, skills, mirror and links
         run: node scripts/agents-sync.mjs --check --all-markdown
       - name: Install lint tools

@@ -9,7 +9,7 @@
 [![Accessibility: WCAG 2.2 AA](https://img.shields.io/badge/A11y-WCAG%202.2%20AA-brightgreen.svg)](.agents/rules/10-accessibility.md)
 [![Design Tokens: DTCG 2025.10](https://img.shields.io/badge/Design%20Tokens-DTCG%202025.10-orange.svg)](.agents/skills/design-system-and-tokens/SKILL.md)
 
-Projects 27 combines everything in [Projects 23](https://github.com/gerrardgs/Projects23) (engineering: back end, data, AI, cloud, security, 30 skills) and [Projects 24](https://github.com/gerrardgs/Projects24) (design, front end, mobile, media, 37 skills) into one specification of 17 rules and 58 skills, and applies it to one product: an enterprise finance reporting system for monthly income and expense reports, financial statements, budgets, bank reconciliation and period close, with AI assistance, speech input and automated recaps.
+Projects 27 combines everything in [Projects 23](https://github.com/gerrardgs/Projects23) (engineering: back end, data, AI, cloud, security, 30 skills) and [Projects 24](https://github.com/gerrardgs/Projects24) (design, front end, mobile, media, 37 skills) into one specification of 18 rules and 61 skills, and applies it to one product: an enterprise finance reporting system for monthly income and expense reports, financial statements, budgets, bank reconciliation and period close, with AI assistance, speech input and automated recaps.
 
 | Document | Content |
 | :--- | :--- |
@@ -110,7 +110,7 @@ Projects 27 Architecture: Digital Design & Front-End Engineering
 
 ## Skills Catalog
 
-### 1. Digital Design, UI/UX, & Graphics Skills (10 Skills)
+### 1. Digital Design, UI/UX, & Graphics Skills (13 Skills)
 
 Step-by-step procedures covering visual research, prototyping, design systems, vector art, and Figma integration:
 
@@ -124,6 +124,7 @@ Step-by-step procedures covering visual research, prototyping, design systems, v
 | **System** | [design-system-and-tokens](.agents/skills/design-system-and-tokens/SKILL.md) | DTCG 2025.10 tokens, light/dark themes, **tested token pipeline with automated WCAG contrast checks**, headless components, Storybook, token governance |
 | **Handoff** | [design-to-code-handoff](.agents/skills/design-to-code-handoff/SKILL.md) | Mapping design files or screenshots to tokens and components, bridging the gap between design mockups and real-world interactive code |
 | **Anti-Slop** | [anti-slop-filter](.agents/skills/anti-slop-filter/SKILL.md) | Filter for generic AI output adapted from antislop (MIT): direction from the brand or `DESIGN.md` as data, Design Read with energy, rhythm and motion dials, hard gates (honest content, working controls, states, contrast, mobile, themes, click-through evidence), a one-line reason for every technique, UI, writing and code-comment slop catalogues, PASS/FAIL delivery report |
+| **Content Hygiene** | [content-hygiene](.agents/skills/content-hygiene/SKILL.md) | Zero-dependency scanner (5 tests) for invisible and bidirectional Unicode: removes zero-width and tag characters (hidden text, prompt smuggling), flags Trojan Source controls in code, keeps what scripts and emoji need; strips GPS, serial and owner metadata from files while keeping AI disclosures, Content Credentials and copyright notices |
 | **Clean Text** | [clean-user-facing-text](.agents/skills/clean-user-facing-text/SKILL.md) | Local zero-dependency Unicode hygiene and stylometric rewrite pass for reader-facing prose while preserving author voice and factual integrity |
 | **Provenance** | [remove-ai-marks](.agents/skills/remove-ai-marks/SKILL.md) | Multi-vendor AI mark removal: invisible Unicode (Layer A), statistical rewrite (Layer B), and C2PA/EXIF/container metadata stripping across files |
 | **AI Design** | [ai-design-and-artifacts](.agents/skills/ai-design-and-artifacts/SKILL.md) | Claude Design and artifacts: design system first (`/design-sync`), briefs and iteration, review of AI-generated designs (tokens, measured contrast, licences), handoff with the bundle or `/design` **without overwriting existing code**, safe sharing |

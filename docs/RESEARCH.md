@@ -45,7 +45,7 @@ The development machine used on 2026-10-28 runs Node.js 24.9.0, older than the c
 
 ## 5. Owner answers
 
-The owner answered the open questions on 2026-10-28; the decisions are in [PRD.md](PRD.md) section 8. Still open: hosting provider and region.
+The owner answered the open questions on 2026-10-28; the decisions are in [PRD.md](PRD.md#owner-decisions-2026-10-28). Still open: hosting provider and region.
 
 ## 6. Facts checked for stage 2 (2026-10-28)
 

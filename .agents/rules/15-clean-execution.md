@@ -31,7 +31,7 @@ Rollback:    <how to undo each step>
 ## 2. While acting
 
 - One logical change at a time; verify it (build, lint, type-check, test, or run and look at the rendered page) before the next one.
-- Use the project's own commands and versions (`npm ci`, `npx --no-install <tool>`, the scripts in `package.json`), not global installs or remembered ones. Run them in the terminal; read summaries, not logs ([CLI first](../../docs/spec/AGENT-OPERATIONAL-MANUAL.md#5-cli-first-small-output)).
+- Use the project's own commands and versions (`npm ci`, `npx --no-install <tool>`, the scripts in `package.json`), not global installs or remembered ones. Use the terminal; read summaries ([CLI first](../../docs/spec/AGENT-OPERATIONAL-MANUAL.md#5-cli-first-small-output)).
 - Commands are idempotent where possible: running them twice must not duplicate data or break state.
 - Touch only what the task needs. No drive-by reformatting, renames, restyling or "improvements" ([01-core-principles](01-core-principles.md) section 1).
 - Regenerate derived files with their generator after changing sources (lockfiles, the `.claude/skills/` mirror, token CSS, `_headers` and `vercel.json`, generated code); never edit generated output by hand.
