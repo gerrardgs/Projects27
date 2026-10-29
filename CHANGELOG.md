@@ -2,6 +2,38 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.7.0: secret scanning in layers, and leaked-secret response (2026-10-29)
+
+The repository owner asked to adopt [gitleaks](https://github.com/gitleaks/gitleaks) (MIT, v8.30.1), [TruffleHog](https://github.com/trufflesecurity/trufflehog) (AGPL-3.0, v3.99.7, used as a tool), [GitHub push protection](https://docs.github.com/en/code-security/concepts/secret-security/push-protection) and [GitHub Secret Protection](https://github.com/security/advanced-security/secret-protection) as skills and rules, checked on 2026-10-29. Same content as Projects 23 v2.24.0 and Projects 24 v1.18.0, adapted to this product. The existing `secrets` CI job (gitleaks 8.30.1, checksum-verified, full history and files) stays as it is.
+
+### Added
+
+- Rule 21 (`21-secret-scanning.md`, on demand):
+  - layered detection with pinned, checksum-verified scanners and redacted reports;
+  - live verification only where the owner allows it;
+  - narrow, reviewed suppressions;
+  - push protection is never bypassed by an agent;
+  - revoke-first leak response;
+  - assembled test fixtures;
+  - this product's server secrets (`DATABASE_URL`, `TOTP_KEY`, `ANTHROPIC_API_KEY`) live only in the git-ignored `apps/api/.env` (mode 600) and in the host's secret store, and a leaked `TOTP_KEY` or database credential is handled as a leak of personal financial data.
+- Skill `secret-scanning`, with an "In this repository" section: which layers already exist and which are missing (pre-commit hook, repository-level push protection, TruffleHog verification), why a local `gitleaks dir .` reports `apps/api/.env`, and how financial data found by a scan is reported.
+  - References: `tools.md`, `github-secret-protection.md`, `leaked-secret-runbook.md`.
+  - Assets: `gitleaks.example.toml` (parsed; its database-URL rule tested against a URL with a password and the password-less `projects27_dev` URL), `pre-commit-secrets.example.yaml`, `secret-scan.example.yml` (actionlint 1.7.12 with ShellCheck: clean).
+  - Tested `secret-report.mjs` (5 tests).
+- CI: the report merger's tests in the helper-test step.
+
+### Changed
+
+- `AGENTS.md`: rule 21 and the skill in the indexes.
+  - To stay within the 20,000-token always-on budget (exactly 20,000 after the change), the rule rows for 19, 20 and 21 share one row, and a few lines were reworded more tightly without changing their meaning: workflow steps 3 and 5, the rule 16 row and the paired-skills note.
+  - The next addition to `AGENTS.md` needs a matching cut first.
+- `CLAUDE.md` on-demand list; `security-hardening` and `project-bootstrap` link to the new skill.
+- README badges (66 skills, 21 rules), product table and catalog row; `docs/SECURITY.md` links the runbook; `docs/spec/AGENT-OPERATIONAL-MANUAL.md`, `docs/spec/ENGINEERING-CONCEPTS.md`, `.agents/engineering-concepts.md`, `.agents/domain-coverage.md`.
+
+### Not verified here
+
+- gitleaks and TruffleHog were not run locally, because neither is installed on this machine. The repository's push protection setting could not be read without signing in.
+
 ## 1.6.0: reverse engineering within the law, and release-artifact audits (2026-10-29)
 
 The repository owner asked to adopt the relevant parts of [morluto/rea](https://github.com/morluto/rea) ("Reverse Engineer Anything", MIT, v6.8.0, commit `d39b300`, read on 2026-10-29) as skills and rules. Same content as Projects 23 v2.23.0 and Projects 24 v1.17.0, adapted to this repository and to the finance product. REA's "see a feature you like, build your own" use case is left out.

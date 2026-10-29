@@ -42,7 +42,7 @@ API tests cover sign-in limits, TOTP, session revocation, permissions per role, 
 
 ## Incident response
 
-1. Contain: revoke sessions (sign-out, or delete rows in `sessions`), rotate the affected secret, take the API offline if data is at risk.
+1. Contain: revoke sessions (sign-out, or delete rows in `sessions`), rotate the affected secret ([leaked-secret runbook](../.agents/skills/secret-scanning/references/leaked-secret-runbook.md)), take the API offline if data is at risk.
 2. Assess: `GET .../audit/verify` and the audit trail show what changed and who changed it.
 3. Notify: personal-data breaches follow [PRIVACY.md](PRIVACY.md#breach-response) (UU 27/2022 Article 46: written notice within 3 × 24 hours).
 4. Fix and record: a test that reproduces the issue, the fix, and an entry in the CHANGELOG.

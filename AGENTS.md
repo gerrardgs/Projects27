@@ -47,9 +47,9 @@ If your tool does not load these folders automatically, **open the matching file
 
 1. **Understand.** Restate the goal, the users, and the acceptance criteria. Identify inputs, outputs, states, edge cases, failure modes and constraints (brand, platform, devices, support target, deadline). Ask only when a decision truly belongs to the user; otherwise pick the conventional option and state it.
 2. **Ground in reality.** Read the relevant code and design sources before editing: manifests (`package.json`, lockfiles, framework config), the design system and tokens, the Figma/Penpot file or brief, the README and CI config. Note exact runtime, framework and dependency versions.
-3. **Plan the smallest correct change, then wait for approval.** Prefer modifying existing components and tokens over adding layers. Write the implementation plan for every change, small ones included ([15-clean-execution](.agents/rules/15-clean-execution.md) section 1), and start only after the user approves it.
+3. **Plan the smallest correct change, then wait for approval.** Prefer modifying existing components and tokens over adding layers. Write the implementation plan for every change, small ones included, and start only after approval (non-negotiable 13).
 4. **Implement.** Follow [01-core-principles](.agents/rules/01-core-principles.md), [02-clean-code](.agents/rules/02-clean-code.md), [09-design-principles](.agents/rules/09-design-principles.md) and, for code, [11-frontend-code](.agents/rules/11-frontend-code.md). Design and build every state.
-5. **Verify by executing.** Run the formatter, linters, type checker, tests, build, accessibility checks and, for UI, look at the result in a browser at several widths and themes. Add or update tests for the behaviour you changed. A change is not verified until the commands have actually run. Then look for blind spots, cross-check facts against independent sources, and validate against measurable criteria ([03-verification](.agents/rules/03-verification.md) section 6); for resilience, run the chaos engineering cycle (`resilience-and-chaos-engineering` section 5).
+5. **Verify by executing.** Run the formatter, linters, type checker, tests, build, accessibility checks and, for UI, look at the result in a browser at several widths and themes. Add or update tests for the behaviour you changed. A check that did not run verifies nothing. Then look for blind spots, cross-check facts against independent sources, and validate against measurable criteria ([03-verification](.agents/rules/03-verification.md) section 6); for resilience, run the chaos engineering cycle (`resilience-and-chaos-engineering` section 5).
 6. **Report.** Use the format in section 7.
 
 ## 4. Rules index
@@ -71,11 +71,10 @@ If your tool does not load these folders automatically, **open the matching file
 | [12-web-performance.md](.agents/rules/12-web-performance.md) | on demand | Core Web Vitals, images, fonts, JavaScript, delivery, budgets |
 | [13-visual-assets-and-licensing.md](.agents/rules/13-visual-assets-and-licensing.md) | on demand | Asset licensing, source files, colour management, export specs, print |
 | [14-ux-writing-and-ethics.md](.agents/rules/14-ux-writing-and-ethics.md) | on demand | Interface copy, forms, localisation, deceptive patterns, privacy, consent |
-| [16-project-documentation.md](.agents/rules/16-project-documentation.md) | on demand | The complete, current docs/ set, checked by check-docs |
+| [16-project-documentation.md](.agents/rules/16-project-documentation.md) | on demand | The complete, current docs/ set (check-docs) |
 | [17-financial-integrity.md](.agents/rules/17-financial-integrity.md) | on demand | Money arithmetic, double-entry, periods and close, tax, audit trail, retention, segregation of duties, AI in finance |
 | [18-text-hygiene-and-provenance.md](.agents/rules/18-text-hygiene-and-provenance.md) | on demand | Text hygiene |
-| [19-agentic-delivery-and-review.md](.agents/rules/19-agentic-delivery-and-review.md) | on demand | Agent loops, worktrees, AI review |
-| [20-reverse-engineering.md](.agents/rules/20-reverse-engineering.md) | on demand | Authorized artifact analysis, release audits |
+| [19-agentic-delivery-and-review.md](.agents/rules/19-agentic-delivery-and-review.md), [20-reverse-engineering.md](.agents/rules/20-reverse-engineering.md), [21-secret-scanning.md](.agents/rules/21-secret-scanning.md) | on demand | Agent loops and AI review; authorized artifact analysis; secret scanning, leaks |
 
 ## 5. Skills index: pick the procedure for the task
 
@@ -101,13 +100,13 @@ If your tool does not load these folders automatically, **open the matching file
 | Review | [rigorous-code-audit](.agents/skills/rigorous-code-audit/SKILL.md), [design-critique-and-review](.agents/skills/design-critique-and-review/SKILL.md), [anti-slop](.agents/skills/anti-slop/SKILL.md), [anti-slop-filter](.agents/skills/anti-slop-filter/SKILL.md) | Diffs and codebases; designs; generic AI patterns in code, docs, comments, UI and copy |
 | Agents | [agent-delivery-loop](.agents/skills/agent-delivery-loop/SKILL.md), [git-worktrees](.agents/skills/git-worktrees/SKILL.md), [coderabbit-review](.agents/skills/coderabbit-review/SKILL.md) | Long, parallel or unattended agent work; CodeRabbit reviews |
 | Text hygiene | [content-hygiene](.agents/skills/content-hygiene/SKILL.md), [clean-user-facing-text](.agents/skills/clean-user-facing-text/SKILL.md), [remove-ai-marks](.agents/skills/remove-ai-marks/SKILL.md) | Hidden Unicode, metadata |
-| Secure | [security-hardening](.agents/skills/security-hardening/SKILL.md), [security-vulnerability-audit](.agents/skills/security-vulnerability-audit/SKILL.md), [reverse-engineering](.agents/skills/reverse-engineering/SKILL.md) | Threat modelling, hardening, scanning, secrets; audits with verified, impact-rated findings |
+| Secure | [security-hardening](.agents/skills/security-hardening/SKILL.md), [security-vulnerability-audit](.agents/skills/security-vulnerability-audit/SKILL.md), [reverse-engineering](.agents/skills/reverse-engineering/SKILL.md), [secret-scanning](.agents/skills/secret-scanning/SKILL.md) | Threat modelling, hardening, scanning, secrets; audits with verified, impact-rated findings |
 | Document | [project-documentation](.agents/skills/project-documentation/SKILL.md), [technical-documentation](.agents/skills/technical-documentation/SKILL.md) | The complete docs/ set; READMEs, API and configuration reference, ADRs, runbooks |
 | Automate and ship | [ci-cd-pipeline](.agents/skills/ci-cd-pipeline/SKILL.md), [frontend-deployment](.agents/skills/frontend-deployment/SKILL.md), [deploy-and-release](.agents/skills/deploy-and-release/SKILL.md) | CI, releases, hosting, containers, migrations, rollout, rollback |
 | Operate | [cloud-infrastructure](.agents/skills/cloud-infrastructure/SKILL.md), [it-operations](.agents/skills/it-operations/SKILL.md) | IaC, Kubernetes, IAM, networking, SLOs, DR, cost; identity and SSO, endpoints, backup, ITSM |
 | Any tool | [technology-adoption](.agents/skills/technology-adoption/SKILL.md) | Any language, framework, library, platform or SaaS no other skill covers |
 
-Paired skills: `anti-slop` (code, docs) and `anti-slop-filter` (UI, copy); `chaos-engineering` (experiments) and `resilience-and-chaos-engineering` (SLOs, browser chaos); `technical-documentation` and `project-documentation` (one docs/ set). Use both when a task spans both.
+Paired skills: `anti-slop` (code, docs) and `anti-slop-filter` (UI, copy); `chaos-engineering` (experiments) and `resilience-and-chaos-engineering` (SLOs, browser chaos); `technical-documentation` and `project-documentation` (one docs/ set). Use both when needed.
 
 A task often spans several skills: a designed page uses handoff, CSS, accessibility audit, testing, then review.
 

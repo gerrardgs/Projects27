@@ -45,7 +45,7 @@ Apply the [OWASP Top 10 for LLM Applications 2026](https://genai.owasp.org/resou
 ## 4. Secure the supply chain and pipeline
 
 - Lockfiles committed; reproducible installs in CI; automated dependency updates (Dependabot or Renovate).
-- Secret scanning in pre-commit hooks and in CI (gitleaks).
+- Secret scanning in pre-commit hooks and in CI (gitleaks), with push protection and leak response as in [secret-scanning](../secret-scanning/SKILL.md).
 - Dependency vulnerability audit in CI (ecosystem tool or OSV-Scanner); fail on high and critical findings with a documented exception process.
 - Static analysis (Semgrep, CodeQL, Bandit, gosec) on every pull request.
 - CI hardening per [ci-cd-pipeline](../ci-cd-pipeline/SKILL.md): read-only default permissions, actions pinned to commit SHAs, no secrets exposed to untrusted pull requests.

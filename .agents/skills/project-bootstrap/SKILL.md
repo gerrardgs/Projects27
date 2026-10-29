@@ -27,7 +27,7 @@ Set up the project so that the first commit already builds, lints, type-checks, 
    - `.gitignore` from the official [github/gitignore](https://github.com/github/gitignore) template for the language, plus `.env` and `.env.*` with `!.env.example`
    - [`.env.example`](assets/env.example) (rename to `.env.example`) listing every variable, with no real values
    - [`.vscode/extensions.json`](assets/vscode-extensions.json) (rename and trim to the stack)
-   - [`.pre-commit-config.yaml`](assets/pre-commit-config.yaml) with secret scanning and basic hygiene hooks
+   - [`.pre-commit-config.yaml`](assets/pre-commit-config.yaml) with secret scanning and basic hygiene hooks (the full secret-scanning setup, including push protection and CI, is in [secret-scanning](../secret-scanning/SKILL.md))
    - [`README.md`](assets/README.template.md) and an [ADR](assets/adr-template.md) folder (`docs/adr/`) for significant decisions
    - `CHANGELOG.md` ([Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format) and the linter's config file (for example `eslint.config.mjs` or `biome.json`)
    - For shared or open-source repositories, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md` and `SECURITY.md` (how to report a vulnerability), which GitHub shows as [community health files](https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/creating-a-default-community-health-file) when they are in the root, `docs/` or `.github/`

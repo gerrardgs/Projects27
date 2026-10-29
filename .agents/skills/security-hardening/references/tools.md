@@ -4,6 +4,8 @@ Commands were checked against each tool's official documentation or `--help` out
 
 ## Secret scanning
 
+Layers, TruffleHog verification, GitHub push protection and the leaked-secret runbook: [secret-scanning](../../secret-scanning/SKILL.md).
+
 | Tool | Command |
 | :--- | :--- |
 | gitleaks (v8.19+ syntax) | Whole history: `gitleaks git -v .`; a directory or file: `gitleaks dir -v <path>`. The older `detect` and `protect` commands are deprecated |

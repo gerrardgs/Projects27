@@ -50,6 +50,7 @@ Every domain moves through the same phases. Load the lifecycle skill for the pha
 | Test | [test-engineering](skills/test-engineering/SKILL.md), [quality-assurance](skills/quality-assurance/SKILL.md) |
 | Debug, profile, incidents | [systematic-debugging](skills/systematic-debugging/SKILL.md) |
 | Review | [rigorous-code-audit](skills/rigorous-code-audit/SKILL.md) |
+| Secret scanning, push protection and leaked-credential response | [secret-scanning](skills/secret-scanning/SKILL.md) |
 | Reverse engineering, binary and release-artifact analysis, malware and crash triage | [reverse-engineering](skills/reverse-engineering/SKILL.md), [security-hardening](skills/security-hardening/SKILL.md) |
 | AI code review with CodeRabbit | [coderabbit-review](skills/coderabbit-review/SKILL.md) |
 | Multi-session, parallel or unattended agent work | [agent-delivery-loop](skills/agent-delivery-loop/SKILL.md), [git-worktrees](skills/git-worktrees/SKILL.md) |

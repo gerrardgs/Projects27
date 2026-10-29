@@ -1,0 +1,29 @@
+# Copy to the repository root as ".gitleaks.toml"; gitleaks reads it automatically from the scanned
+# directory (or pass --config). Syntax checked against the gitleaks v8.30.1 README on 2026-10-29.
+title = "project gitleaks configuration"
+
+# Keep all built-in rules (222 in v8.30.1) and add or narrow only what this project needs.
+[extend]
+useDefault = true
+
+# Database connection URLs with an inline password, for example in a committed config file or test.
+# The built-in rules do not cover PostgreSQL or MySQL URLs. Go regular expressions: no lookaheads.
+[[rules]]
+id = "database-url-with-password"
+description = "Database connection URL with an inline password"
+regex = '''(?i)\b(?:postgres(?:ql)?|mysql|mariadb|mongodb(?:\+srv)?|redis|amqps?)://[^:/\s@]+:([^@\s]{6,})@[^/\s]+'''
+secretGroup = 1
+keywords = ["postgres", "mysql", "mariadb", "mongodb", "redis", "amqp"]
+tags = ["database", "project"]
+
+  # Placeholders used in documentation and examples are not secrets.
+  [[rules.allowlists]]
+  description = "documented placeholders"
+  regexTarget = "secret"
+  regexes = ['''(?i)^(?:password|changeme|example|placeholder|\$\{[^}]+\}|<[^>]+>)$''']
+
+# Global allowlists: keep them narrow and give each one a reason. Never allowlist a real secret:
+# rotate it instead. Single known findings belong in .gitleaksignore (by fingerprint), not here.
+[[allowlists]]
+description = "Dart lockfiles carry package hashes, not secrets (npm, pnpm and yarn lockfiles are already allowlisted by the defaults)"
+paths = ['''(?:^|/)pubspec\.lock$''']
