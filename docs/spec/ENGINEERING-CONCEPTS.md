@@ -103,6 +103,9 @@ The [2023 edition](https://www.iso.org/standard/78176.html) defines nine product
 | Contract testing with APIs | [Projects 23 quality-assurance](https://github.com/gerrardgs/Projects23/tree/main/.agents/skills/quality-assurance) |
 | Chaos experiments | [resilience-and-chaos-engineering](../../.agents/skills/resilience-and-chaos-engineering/SKILL.md) |
 | Static analysis and code review | R-02, [rigorous-code-audit](../../.agents/skills/rigorous-code-audit/SKILL.md) |
+| Reverse engineering within the law; release-artifact audits ([REA](https://github.com/morluto/rea), [Directive 2009/24/EC](https://www.legislation.gov.uk/eudr/2009/24/article/6/data.html)) | R-20, [reverse-engineering](../../.agents/skills/reverse-engineering/SKILL.md) |
+| AI-assisted code review with honest outcomes ([CodeRabbit](https://docs.coderabbit.ai/cli)) | R-19, [coderabbit-review](../../.agents/skills/coderabbit-review/SKILL.md) |
+| Context engineering for delivery: phase loop and unattended story loop ([GSD Core](https://github.com/open-gsd/gsd-core), [Ralph](https://github.com/snarktank/ralph)); parallel work in Git worktrees | R-19, [agent-delivery-loop](../../.agents/skills/agent-delivery-loop/SKILL.md), [git-worktrees](../../.agents/skills/git-worktrees/SKILL.md) |
 
 ## 7. Reliability, resilience and operations
 

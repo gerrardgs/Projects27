@@ -13,6 +13,9 @@ Which rules and skills to use for each kind of task, for AI agents and for the p
 | Refactoring | [change-existing-code](../../.agents/skills/change-existing-code/SKILL.md) | rule [02](../../.agents/rules/02-clean-code.md) |
 | Dependency or runtime upgrade | [change-existing-code](../../.agents/skills/change-existing-code/SKILL.md) section 4 | rule [04](../../.agents/rules/04-dependencies.md) |
 | Code review or pull request review | [rigorous-code-audit](../../.agents/skills/rigorous-code-audit/SKILL.md) | rule [06](../../.agents/rules/06-security.md) |
+| Pre-release audit of the web, Android or iOS build, or a question about a shipped artifact | [reverse-engineering](../../.agents/skills/reverse-engineering/SKILL.md), rule [20](../../.agents/rules/20-reverse-engineering.md) | [mobile-engineering](../../.agents/skills/mobile-engineering/SKILL.md) |
+| CodeRabbit review, its pull request comments, or `.coderabbit.yaml` | [coderabbit-review](../../.agents/skills/coderabbit-review/SKILL.md) | [rigorous-code-audit](../../.agents/skills/rigorous-code-audit/SKILL.md) |
+| Work longer than one session, parallel sub-agents, or an unattended loop | [agent-delivery-loop](../../.agents/skills/agent-delivery-loop/SKILL.md), rule [19](../../.agents/rules/19-agentic-delivery-and-review.md) | [git-worktrees](../../.agents/skills/git-worktrees/SKILL.md) |
 | Security review, auth, payments, uploads, personal data | [security-hardening](../../.agents/skills/security-hardening/SKILL.md) | [rigorous-code-audit](../../.agents/skills/rigorous-code-audit/SKILL.md) |
 | Slow code or high memory | [systematic-debugging](../../.agents/skills/systematic-debugging/SKILL.md) "Performance problems" | its [tools reference](../../.agents/skills/systematic-debugging/references/tools.md) |
 | CI is failing | [systematic-debugging](../../.agents/skills/systematic-debugging/SKILL.md) | [ci-cd-pipeline](../../.agents/skills/ci-cd-pipeline/SKILL.md) |

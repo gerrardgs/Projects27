@@ -1,7 +1,7 @@
 # AGENTS.md: Engineering, Design and Front-End Rules for AI Agents (Projects 27)
 
 These instructions apply to every AI model and agent working in this repository: Claude Code, Codex, Gemini CLI, Antigravity, Cursor, Windsurf/Devin, GitHub Copilot, Cline, Aider, and any chat model given this file as a system prompt.
-They merge the Projects 23 engineering and Projects 24 design and front-end specifications and apply them to one product, an enterprise finance reporting system (`docs/PRD.md`): how experienced engineers and designers work together from specification and research to secure, accessible, tested software in production, and how to change existing work safely.
+They merge the Projects 23 engineering and Projects 24 design and front-end specifications and apply them to one product, an enterprise finance reporting system (`docs/PRD.md`): from specification and research to secure, accessible, tested software in production, and safe change of existing work.
 
 **The concept: clean code and clean execution.** Clean code is what the result looks like: readable, idiomatic, typed, tested, accessible, built from tokens and components ([02-clean-code](.agents/rules/02-clean-code.md)). Clean execution is how the work is done: predictable, minimal, verified step by step, reversible, and leaving no mess ([15-clean-execution](.agents/rules/15-clean-execution.md)). Every rule and skill below applies both.
 
@@ -9,8 +9,8 @@ This file is the **always-on core**. Deeper guidance loads on demand:
 
 - **Rules** (short, normative): [`.agents/rules/`](.agents/rules/)
 - **Skills** (step-by-step procedures): [`.agents/skills/`](.agents/skills/) (mirrored to `.claude/skills/` for Claude Code and Cline)
-- **Reference library**: [`docs/spec/DESIGN-REFERENCES.md`](docs/spec/DESIGN-REFERENCES.md); domain coverage: [`.agents/domain-coverage.md`](.agents/domain-coverage.md) and [`.agents/engineering-concepts.md`](.agents/engineering-concepts.md)
-- **Tools, prompts & concepts**: [`docs/spec/TOOLKIT.md`](docs/spec/TOOLKIT.md), [`docs/spec/PROMPT-LIBRARY.md`](docs/spec/PROMPT-LIBRARY.md), [`docs/spec/ENGINEERING-CONCEPTS.md`](docs/spec/ENGINEERING-CONCEPTS.md)
+- **Reference library**: [DESIGN-REFERENCES](docs/spec/DESIGN-REFERENCES.md); domain coverage: [domain-coverage](.agents/domain-coverage.md) and [engineering-concepts](.agents/engineering-concepts.md)
+- **Tools, prompts & concepts**: [TOOLKIT](docs/spec/TOOLKIT.md), [PROMPT-LIBRARY](docs/spec/PROMPT-LIBRARY.md), [ENGINEERING-CONCEPTS](docs/spec/ENGINEERING-CONCEPTS.md)
 
 If your tool does not load these folders automatically, **open the matching file from the tables in sections 4 and 5 before starting that kind of work.**
 
@@ -49,7 +49,7 @@ If your tool does not load these folders automatically, **open the matching file
 2. **Ground in reality.** Read the relevant code and design sources before editing: manifests (`package.json`, lockfiles, framework config), the design system and tokens, the Figma/Penpot file or brief, the README and CI config. Note exact runtime, framework and dependency versions.
 3. **Plan the smallest correct change, then wait for approval.** Prefer modifying existing components and tokens over adding layers. Write the implementation plan for every change, small ones included ([15-clean-execution](.agents/rules/15-clean-execution.md) section 1), and start only after the user approves it.
 4. **Implement.** Follow [01-core-principles](.agents/rules/01-core-principles.md), [02-clean-code](.agents/rules/02-clean-code.md), [09-design-principles](.agents/rules/09-design-principles.md) and, for code, [11-frontend-code](.agents/rules/11-frontend-code.md). Design and build every state.
-5. **Verify by executing.** Run the formatter, linters, type checker, tests, build, accessibility checks and, for UI, look at the result in a browser at several widths and themes. Add or update tests for the behaviour you changed. A change is not verified until the commands have actually run. Then look for blind spots, cross-check facts against independent sources, and validate against measurable criteria ([03-verification](.agents/rules/03-verification.md) section 6); for resilience, run the chaos engineering cycle ([resilience-and-chaos-engineering](.agents/skills/resilience-and-chaos-engineering/SKILL.md) section 5).
+5. **Verify by executing.** Run the formatter, linters, type checker, tests, build, accessibility checks and, for UI, look at the result in a browser at several widths and themes. Add or update tests for the behaviour you changed. A change is not verified until the commands have actually run. Then look for blind spots, cross-check facts against independent sources, and validate against measurable criteria ([03-verification](.agents/rules/03-verification.md) section 6); for resilience, run the chaos engineering cycle (`resilience-and-chaos-engineering` section 5).
 6. **Report.** Use the format in section 7.
 
 ## 4. Rules index
@@ -71,9 +71,11 @@ If your tool does not load these folders automatically, **open the matching file
 | [12-web-performance.md](.agents/rules/12-web-performance.md) | on demand | Core Web Vitals, images, fonts, JavaScript, delivery, budgets |
 | [13-visual-assets-and-licensing.md](.agents/rules/13-visual-assets-and-licensing.md) | on demand | Asset licensing, source files, colour management, export specs, print |
 | [14-ux-writing-and-ethics.md](.agents/rules/14-ux-writing-and-ethics.md) | on demand | Interface copy, forms, localisation, deceptive patterns, privacy, consent |
-| [16-project-documentation.md](.agents/rules/16-project-documentation.md) | on demand | The complete docs/ set (PRD to deployment, accessibility, performance, privacy, glossary), substantial and current, checked by check-docs |
+| [16-project-documentation.md](.agents/rules/16-project-documentation.md) | on demand | The complete, current docs/ set, checked by check-docs |
 | [17-financial-integrity.md](.agents/rules/17-financial-integrity.md) | on demand | Money arithmetic, double-entry, periods and close, tax, audit trail, retention, segregation of duties, AI in finance |
 | [18-text-hygiene-and-provenance.md](.agents/rules/18-text-hygiene-and-provenance.md) | on demand | Text hygiene |
+| [19-agentic-delivery-and-review.md](.agents/rules/19-agentic-delivery-and-review.md) | on demand | Agent loops, worktrees, AI review |
+| [20-reverse-engineering.md](.agents/rules/20-reverse-engineering.md) | on demand | Authorized artifact analysis, release audits |
 
 ## 5. Skills index: pick the procedure for the task
 
@@ -89,7 +91,7 @@ If your tool does not load these folders automatically, **open the matching file
 | Build web | [frontend-from-scratch](.agents/skills/frontend-from-scratch/SKILL.md), [framework-frontend-engineering](.agents/skills/framework-frontend-engineering/SKILL.md), [web-frontend-engineering](.agents/skills/web-frontend-engineering/SKILL.md), [css-architecture-and-responsive](.agents/skills/css-architecture-and-responsive/SKILL.md), [web-integrations-and-platforms](.agents/skills/web-integrations-and-platforms/SKILL.md) | Pages and apps, frameworks, browser security, CSS and themes, CMS, payments, PWA, SEO |
 | Build back end | [native-from-scratch](.agents/skills/native-from-scratch/SKILL.md), [backend-engineering](.agents/skills/backend-engineering/SKILL.md), [api-integration](.agents/skills/api-integration/SKILL.md) | Services and CLIs standard library first; REST/GraphQL/gRPC, databases, queues, jobs; third-party APIs, OAuth, webhooks, payments |
 | Build mobile | [mobile-engineering](.agents/skills/mobile-engineering/SKILL.md) | iOS, Android, Flutter, React Native: platform design, accessibility, security, store release |
-| Data and AI | [data-engineering](.agents/skills/data-engineering/SKILL.md), [data-analysis](.agents/skills/data-analysis/SKILL.md), [machine-learning](.agents/skills/machine-learning/SKILL.md), [llm-applications](.agents/skills/llm-applications/SKILL.md), [rag-systems](.agents/skills/rag-systems/SKILL.md), [ai-agent-systems](.agents/skills/ai-agent-systems/SKILL.md), [computer-vision](.agents/skills/computer-vision/SKILL.md), [ml-inference-serving](.agents/skills/ml-inference-serving/SKILL.md) | Data pipelines, analysis, ML, LLM features and evals, retrieval, agents, OCR, model serving |
+| Data and AI | [data-engineering](.agents/skills/data-engineering/SKILL.md), [data-analysis](.agents/skills/data-analysis/SKILL.md), [machine-learning](.agents/skills/machine-learning/SKILL.md), [llm-applications](.agents/skills/llm-applications/SKILL.md), [rag-systems](.agents/skills/rag-systems/SKILL.md), [ai-agent-systems](.agents/skills/ai-agent-systems/SKILL.md), [computer-vision](.agents/skills/computer-vision/SKILL.md), [ml-inference-serving](.agents/skills/ml-inference-serving/SKILL.md) | Pipelines, analysis, ML, LLM features and evals, retrieval, agents, OCR, model serving |
 | Integrate | [mcp-servers-and-integrations](.agents/skills/mcp-servers-and-integrations/SKILL.md) | Choosing, vetting, configuring and securing MCP servers; databases via MCP Toolbox |
 | Finance | [finance-reporting-systems](.agents/skills/finance-reporting-systems/SKILL.md) | Ledger, chart of accounts, monthly income and expense reports, statements, tax, close, audit trail, AI and speech input for finance |
 | Change | [change-existing-code](.agents/skills/change-existing-code/SKILL.md) | Modifying, refactoring, upgrading or migrating existing code |
@@ -97,32 +99,33 @@ If your tool does not load these folders automatically, **open the matching file
 | Tune and prove | [web-performance-optimization](.agents/skills/web-performance-optimization/SKILL.md), [resilience-and-chaos-engineering](.agents/skills/resilience-and-chaos-engineering/SKILL.md), [chaos-engineering](.agents/skills/chaos-engineering/SKILL.md) | Core Web Vitals; failure modes, SLOs and error budgets; fault-injection experiments and game days |
 | Debug | [systematic-debugging](.agents/skills/systematic-debugging/SKILL.md) | Errors, crashes, wrong output, slowness, incidents |
 | Review | [rigorous-code-audit](.agents/skills/rigorous-code-audit/SKILL.md), [design-critique-and-review](.agents/skills/design-critique-and-review/SKILL.md), [anti-slop](.agents/skills/anti-slop/SKILL.md), [anti-slop-filter](.agents/skills/anti-slop-filter/SKILL.md) | Diffs and codebases; designs; generic AI patterns in code, docs, comments, UI and copy |
+| Agents | [agent-delivery-loop](.agents/skills/agent-delivery-loop/SKILL.md), [git-worktrees](.agents/skills/git-worktrees/SKILL.md), [coderabbit-review](.agents/skills/coderabbit-review/SKILL.md) | Long, parallel or unattended agent work; CodeRabbit reviews |
 | Text hygiene | [content-hygiene](.agents/skills/content-hygiene/SKILL.md), [clean-user-facing-text](.agents/skills/clean-user-facing-text/SKILL.md), [remove-ai-marks](.agents/skills/remove-ai-marks/SKILL.md) | Hidden Unicode, metadata |
-| Secure | [security-hardening](.agents/skills/security-hardening/SKILL.md), [security-vulnerability-audit](.agents/skills/security-vulnerability-audit/SKILL.md) | Threat modelling, hardening, scanning, secrets; audits with verified, impact-rated findings |
+| Secure | [security-hardening](.agents/skills/security-hardening/SKILL.md), [security-vulnerability-audit](.agents/skills/security-vulnerability-audit/SKILL.md), [reverse-engineering](.agents/skills/reverse-engineering/SKILL.md) | Threat modelling, hardening, scanning, secrets; audits with verified, impact-rated findings |
 | Document | [project-documentation](.agents/skills/project-documentation/SKILL.md), [technical-documentation](.agents/skills/technical-documentation/SKILL.md) | The complete docs/ set; READMEs, API and configuration reference, ADRs, runbooks |
 | Automate and ship | [ci-cd-pipeline](.agents/skills/ci-cd-pipeline/SKILL.md), [frontend-deployment](.agents/skills/frontend-deployment/SKILL.md), [deploy-and-release](.agents/skills/deploy-and-release/SKILL.md) | CI, releases, hosting, containers, migrations, rollout, rollback |
 | Operate | [cloud-infrastructure](.agents/skills/cloud-infrastructure/SKILL.md), [it-operations](.agents/skills/it-operations/SKILL.md) | IaC, Kubernetes, IAM, networking, SLOs, DR, cost; identity and SSO, endpoints, backup, ITSM |
 | Any tool | [technology-adoption](.agents/skills/technology-adoption/SKILL.md) | Any language, framework, library, platform or SaaS no other skill covers |
 
-Paired skills differ in scope: `anti-slop` (code, docs) and `anti-slop-filter` (UI, copy); `chaos-engineering` (experiments) and `resilience-and-chaos-engineering` (SLOs, browser chaos); `technical-documentation` and `project-documentation` (one docs/ set). Use both when a task spans both.
+Paired skills: `anti-slop` (code, docs) and `anti-slop-filter` (UI, copy); `chaos-engineering` (experiments) and `resilience-and-chaos-engineering` (SLOs, browser chaos); `technical-documentation` and `project-documentation` (one docs/ set). Use both when a task spans both.
 
-A task often spans several skills. Building a designed page, for example, uses design-to-code handoff, CSS, accessibility audit, testing, then review.
+A task often spans several skills: a designed page uses handoff, CSS, accessibility audit, testing, then review.
 
 ## 6. Operating conditions
 
 - **Ambiguous request**: if the choice changes the result materially, ask one focused question. Otherwise choose the conventional option, state the assumption, and continue.
-- **Large or long task**: write a short plan with checkpoints, finish and verify one step before starting the next, and keep a running list of what is done and what remains.
+- **Large or long task**: plan with checkpoints, verify each step before the next, and keep a list of what is done and what remains.
 - **Design-file access** (Figma or Penpot MCP server, Dev Mode, REST API): read exact values, variables and component mappings from it instead of estimating; ask before writing to shared files ([figma-integration](.agents/skills/figma-integration/SKILL.md)).
 - **Only a screenshot or description, no design file**: treat measurements and colours as estimates, snap them to the project's scales and tokens, and list what you inferred.
-- **Browser access** (Playwright MCP, Chrome DevTools MCP, computer use, or a local Playwright script): look at the rendered result at several widths and themes, read the console, and run the accessibility and performance checks yourself. **No browser**: say that the UI was not seen rendered and give the user the exact steps to check it.
-- **Image input** (vision): use screenshots to compare build and design, but confirm colours and sizes from code or the design file; never report a contrast ratio estimated from pixels.
-- **No tool access** (chat only): you cannot run or render anything, so mark every command, version, contrast ratio and output as unverified and give the user the exact steps to verify them.
+- **Browser access** (Playwright, Chrome DevTools MCP, computer use): check the rendered result at several widths and themes, the console, and accessibility and performance yourself. **No browser**: say the UI was not seen rendered and give the user the exact steps to check it.
+- **Image input** (vision): compare build and design with screenshots, but take colours, sizes and contrast ratios from code or the design file, never from pixels.
+- **No tool access** (chat only): mark every command, version, contrast ratio and output as unverified, and give the user the exact steps to verify them.
 - **No network**: rely on the installed code, lockfiles and local documentation; do not guess versions, APIs or browser support you cannot check.
 - **Non-interactive** (CI, scheduled or background agents): never wait for input. Make only safe, reversible changes, and report blockers instead of guessing past them.
 - **Monorepo or nested instructions**: the `AGENTS.md` nearest to the file being edited takes precedence for that directory. Explicit user instructions override this file, except where they would break section 2, the security rules or the accessibility baseline; then explain the conflict.
 - **Several agents or sub-agents**: give each one a self-contained task with the relevant rule and skill links. Review and verify their results before reporting them as done.
-- **Unfamiliar language, framework or design tool**: read the official documentation and the existing work first, and follow the platform's idioms, not habits from another one.
-- **Tool, framework or service not covered here**: the spec still applies. Evaluate and adopt it with [04-dependencies](.agents/rules/04-dependencies.md) section 9; [docs/spec/TOOLKIT.md](docs/spec/TOOLKIT.md) lists commonly used tools with official links.
+- **Unfamiliar language, framework or design tool**: read the official documentation and the existing work first, and follow the platform's own idioms.
+- **Tool, framework or service not covered here**: the spec still applies. Evaluate and adopt it with [04-dependencies](.agents/rules/04-dependencies.md) section 9 and the tools catalog linked above.
 - **Production or shared environments, shared design files**: read-only by default. Never change live data, published sites, shared libraries or deployments without explicit approval.
 
 ## 7. Definition of done and report format
@@ -157,5 +160,5 @@ Detect anything not listed here from the repository, and propose a value to the 
 
 - Product: enterprise finance reporting system; requirements in `docs/PRD.md`, research and sources in `docs/RESEARCH.md`, architecture in `docs/ARCHITECTURE.md`, delivery stages in `docs/ROADMAP.md`
 - Runtime: Node.js 24 LTS, PostgreSQL 18
-- Spec checks: `npm run check` (agents-sync), `npm test`, `npm run lint`, `npm run check:links`
+- Spec checks: `npm run verify` (agents-sync check, lint, test), `npm run check:links`
 - Apps: `apps/api` (`npm test` with `TEST_DATABASE_URL`), `apps/web` (`npm run e2e`); contract in `packages/contract`

@@ -2,6 +2,57 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.6.0: reverse engineering within the law, and release-artifact audits (2026-10-29)
+
+The repository owner asked to adopt the relevant parts of [morluto/rea](https://github.com/morluto/rea) ("Reverse Engineer Anything", MIT, v6.8.0, commit `d39b300`, read on 2026-10-29) as skills and rules. Same content as Projects 23 v2.23.0 and Projects 24 v1.17.0, adapted to this repository and to the finance product. REA's "see a feature you like, build your own" use case is left out.
+
+### Added
+
+- Rule 20 (`20-reverse-engineering.md`, on demand): written scope and authority; allowed purposes; never circumvent protection measures, copy proprietary code, assets or design, or extract credentials or personal data; static before runtime and untrusted targets in isolation; pinned tools; observed, inferred and unknown findings; release builds audited. For this product, device copies, captures and crash reports contain personal financial data, so analysis uses synthetic data, and real data is handled only under rule 17 and `docs/PRIVACY.md`.
+- Skill `reverse-engineering` with a release checklist for this product:
+  - web `dist` audited;
+  - Android release built with `--dart-define=API_BASE_URL=https://...`, so no `10.0.2.2` or `localhost` remains, and `apksigner` verified;
+  - iOS `.ipa` audited, with `codesign` and entitlements checked;
+  - no `ANTHROPIC_API_KEY` in any client;
+  - the offline device copy matches `docs/PRIVACY.md`.
+
+  References `legal-and-scope.md`, `evidence-ledger.md` and `rea-routes.md`. Tested zero-dependency `audit-artifact.mjs` (7 tests).
+- **Checked on this repository's own builds**:
+  - `apps/web/dist`: 4 files, no findings.
+  - The debug APK: 159 files, no secrets. The development address `http://10.0.2.2:8080` was found in `assets/flutter_assets/kernel_blob.bin`, which is expected in a debug build and is the reason for the release check.
+  - `apksigner` 37.0.0: the debug APK verifies with signature scheme v2.
+- CI: the auditor's tests in the helper-test step.
+
+### Changed
+
+- `AGENTS.md`: rule 20 and the skill in the indexes. To stay within the 20,000-token always-on budget (19,999 after the change), several lines were reworded more tightly without changing their meaning: link texts of the reference documents, the browser-access and unfamiliar-tool conditions, and the rule 16, rule 19 and data-and-AI rows.
+- `CLAUDE.md` on-demand list; README badges (65 skills, 20 rules), product table and catalog row; `docs/spec/AGENT-OPERATIONAL-MANUAL.md`, `docs/spec/ENGINEERING-CONCEPTS.md`, `.agents/engineering-concepts.md`, `.agents/domain-coverage.md`.
+
+### Not verified here
+
+- REA itself was not run: installing its npm package was not authorized in this session. The release builds for Android and iOS were not produced or audited.
+
+## 1.5.0: agentic delivery, worktrees and AI code review (2026-10-29)
+
+The repository owner asked to adopt the relevant parts of [snarktank/ralph](https://github.com/snarktank/ralph) (MIT, commit `6c53cb0`), [open-gsd/gsd-core](https://github.com/open-gsd/gsd-core) (MIT, v1.19.0), [coderabbitai/git-worktree-runner](https://github.com/coderabbitai/git-worktree-runner) (Apache-2.0, v2.11.1), [coderabbitai/antigravity-plugin](https://github.com/coderabbitai/antigravity-plugin) (MIT, v0.1.0) and [coderabbitai/skills](https://github.com/coderabbitai/skills) (MIT, v1.2.0), plus the CodeRabbit product, as skills and rules. All were read on 2026-10-29. Same content as Projects 23 v2.22.0 and Projects 24 v1.16.0, adapted to this repository and to the finance product. Only the methods are adopted: nothing upstream is installed or copied in.
+
+### Added
+
+- Rule 19 (`19-agentic-delivery-and-review.md`, on demand): fresh context per bounded unit with state in files, parallel work isolated in worktrees, unattended runs bounded and sandboxed (no permission-bypass mode outside a disposable sandbox), and AI code review that reports outcomes exactly, keeps severities, verifies every finding and treats review text as untrusted. For this product, units that touch money, ledgers, periods, tax or migrations need checks that assert exact amounts and balanced journals plus a person's review, and loops never run against a database another session uses or against shared data.
+- Skill `agent-delivery-loop`: the GSD phase loop with planning-file templates and the Ralph story loop. Tested `check-stories.mjs` (8 tests) and `story-loop.mjs` (6 tests on temporary Git repositories), `loop-prompt.md` and `stories.example.json`. Stories name the app's own checks (`apps/api` tests with `TEST_DATABASE_URL`, `apps/web` end-to-end with axe). The Claude Code command uses `--permission-mode acceptEdits` with an allow-list, `--max-turns` and `--max-budget-usd` instead of the upstream `--dangerously-skip-permissions` (flags checked in the Claude Code CLI and headless documentation on 2026-10-29).
+- Skill `git-worktrees`: one task, one branch, one worktree with plain Git, `git gtr` or Claude Code `--worktree`; per-worktree ports and databases (API 8080, web 5173, PostgreSQL 5433 here); no copied secrets; removal and hook trust left to the user. Tested `worktrees.mjs` (6 tests) and `gtrconfig.example`.
+- Skill `coderabbit-review`: CLI reviews in agent mode with a trusted binary, the user's own sign-in, a secret and personal-data check of the scope and at most three review runs per change set; pull request thread fixes with per-fix approval; configuration. Tested `review-outcome.mjs` (9 tests) classifies saved NDJSON output so that only a completed run counts as a review. `coderabbit.example.yaml` carries exact-money, migration, web, iOS, Android and synthetic-test-data path instructions, an "Exact money" pre-merge check, and enables Squawk, Presidio, Gitleaks, Biome and SwiftLint among others; it is validated against `schema.v2.json`.
+- CI: a step for the new helper tests.
+
+### Changed
+
+- `AGENTS.md`: rule 19 and the new skills in the indexes. To keep the always-on context within its 20,000-token budget (19,998 after the change), several existing lines were reworded more tightly without changing their meaning: the introduction, the docs/ rule row, the paired-skills note, three operating conditions, the tool-adoption condition, the resilience pointer in workflow step 5 and the spec checks in the project profile.
+- `CLAUDE.md` on-demand list; README badges (64 skills, 19 rules), product table and catalog rows; `docs/spec/AGENT-OPERATIONAL-MANUAL.md`, `docs/spec/ENGINEERING-CONCEPTS.md`, `.agents/engineering-concepts.md`, `.agents/domain-coverage.md`.
+
+### Not verified here
+
+- A real CodeRabbit review and a real `git gtr` run: neither CLI is installed on this machine, and signing in to CodeRabbit is the owner's step.
+
 ## 1.4.0: complete documentation set and content-hygiene audit (2026-10-29)
 
 ### Added

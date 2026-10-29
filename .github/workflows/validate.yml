@@ -79,6 +79,8 @@ jobs:
         run: node --test ".agents/skills/technical-documentation/assets/*.test.mjs"
       - name: Content hygiene scanner tests
         run: node --test ".agents/skills/content-hygiene/assets/*.test.mjs"
+      - name: Agent delivery, worktree, review and artifact audit helper tests
+        run: node --test ".agents/skills/agent-delivery-loop/assets/*.test.mjs" ".agents/skills/git-worktrees/assets/*.test.mjs" ".agents/skills/coderabbit-review/assets/*.test.mjs" ".agents/skills/reverse-engineering/assets/*.test.mjs"
       - name: Product documentation set is complete (rule 16)
         run: node .agents/skills/technical-documentation/assets/check-docs.mjs docs
       - name: No hidden or bidirectional Unicode in code and documentation

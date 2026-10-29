@@ -1,0 +1,115 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# Starting point for this finance reporting product (API, web, iOS, Android). Copy to the repository root
+# as ".coderabbit.yaml" only after the owner has decided to use the CodeRabbit GitHub App; reviews send
+# code to CodeRabbit (see references/configuration.md). Validated against schema.v2.json on 2026-10-29.
+# Unset keys keep CodeRabbit's defaults.
+language: en-US
+
+reviews:
+  profile: chill
+  high_level_summary: true
+  review_status: true
+  poem: false
+  in_progress_fortune: false
+  enable_prompt_for_ai_agents: true
+  auto_review:
+    enabled: true
+    drafts: false
+
+  # Generated, vendored or build output: review the source instead.
+  path_filters:
+    - "!**/dist/**"
+    - "!**/build/**"
+    - "!**/coverage/**"
+    - "!**/test-results/**"
+    - "!**/playwright-report/**"
+    - "!apps/ios/**/*.xcodeproj/**"
+    - "!.claude/skills/**"
+
+  path_instructions:
+    - path: "apps/api/src/**"
+      instructions: |
+        Apply AGENTS.md, rule 17 (financial integrity) and rule 06. Amounts are integers in minor units
+        (bigint) or exact decimals, never binary floating point; every journal balances; posted entries
+        are corrected by reversal, never edited; every query is parameterised; every request checks that
+        the caller may access that entity; amounts, account numbers and personal data never reach logs;
+        imports and AI or speech capture only fill drafts that a person confirms.
+    - path: "apps/api/migrations/**"
+      instructions: |
+        Migrations must be safe on a live database: expand, then migrate, then contract; no long locks;
+        money columns exact (BIGINT or NUMERIC); constraints that keep the ledger balanced stay enforced.
+    - path: "apps/web/**"
+      instructions: |
+        WCAG 2.2 AA (keyboard, focus, labels, announced errors). Amounts formatted with Intl.NumberFormat
+        for id-ID and IDR, never computed in floating point in the browser; no personal financial data in
+        localStorage beyond what the offline design documents; no secrets in VITE_ variables.
+    - path: "apps/ios/**/*.swift"
+      instructions: |
+        Money as Int64 minor units or Decimal, never Double; credentials only in the Keychain; offline
+        copies follow the documented outbox design; UI reachable with VoiceOver and Dynamic Type.
+    - path: "apps/android/lib/**"
+      instructions: |
+        Money as int minor units, never double; tokens in secure storage; offline copies follow the
+        documented outbox design; UI usable with TalkBack and large text.
+    - path: "**/{test,tests,e2e,eval,integration_test}/**"
+      instructions: |
+        Synthetic data only, never real people's financial records; tests assert exact amounts and cover
+        failure paths; no real clock, network or random order without injection.
+    - path: ".github/workflows/**"
+      instructions: |
+        Third-party actions pinned to a full commit SHA with the version in a comment, least-privilege
+        permissions per job, no secrets printed, no untrusted input interpolated into run scripts.
+    - path: "**/SKILL.md"
+      instructions: |
+        Keep the skill focused on routing and workflow; detail belongs in references. Every referenced
+        file, command and flag must exist and match its current official documentation.
+
+  pre_merge_checks:
+    title:
+      mode: warning
+      requirements: "Conventional Commits format: type(optional scope): summary in the imperative mood."
+    description:
+      mode: warning
+    custom_checks:
+      - name: Verification evidence
+        mode: warning
+        instructions: |
+          Pass when the pull request description lists the checks that were run for each app it touches
+          (API tests, web unit and end-to-end tests, Flutter tests, Swift checks) and their results, or
+          states which were not run and why. Fail otherwise.
+      - name: Exact money
+        mode: error
+        instructions: |
+          Fail when the changed code stores, parses or computes a monetary amount with binary floating
+          point (JavaScript number arithmetic on amounts, Swift Double or Float, Dart double, SQL REAL,
+          FLOAT or DOUBLE PRECISION). Pass otherwise.
+      - name: Only the human author is credited
+        mode: error
+        instructions: |
+          Fail when the pull request title or description contains a "Generated with" line naming an
+          AI tool, or a Co-Authored-By or Signed-off-by line naming an AI agent or bot. Pass otherwise.
+
+  tools:
+    biome:
+      enabled: true
+    squawk:
+      enabled: true
+    swiftlint:
+      enabled: true
+    gitleaks:
+      enabled: true
+    presidio:
+      enabled: true
+    markdownlint:
+      enabled: true
+    actionlint:
+      enabled: true
+    zizmor:
+      enabled: true
+
+knowledge_base:
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - "AGENTS.md"
+      - ".agents/rules/*.md"

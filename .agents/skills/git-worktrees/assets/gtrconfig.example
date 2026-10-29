@@ -1,0 +1,14 @@
+# Team settings for git-worktree-runner (`git gtr`). Copy to the repository root as ".gtrconfig".
+# Gitconfig syntax; keys from the upstream template (coderabbitai/git-worktree-runner v2.11.1,
+# templates/.gtrconfig.example). Hooks in a committed .gtrconfig run only after each person reviews
+# them with `git gtr trust`. An agent never runs that command.
+
+[copy]
+    # Copy examples, never real secrets: each worktree creates its own .env from the example.
+    include = **/.env.example
+    exclude = **/.env
+    exclude = **/.env.local
+
+[hooks]
+    # Runs in the new worktree. Use the project's reproducible install, quietly.
+    postCreate = npm ci --no-audit --no-fund

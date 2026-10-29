@@ -1,6 +1,6 @@
 {
   "name": "projects27",
-  "version": "1.4.0",
+  "version": "1.6.0",
   "private": true,
   "description": "Projects 27 - Enterprise finance reporting system built on the merged Projects 23 (engineering) and Projects 24 (design and front-end) AI agent specifications",
   "type": "module",

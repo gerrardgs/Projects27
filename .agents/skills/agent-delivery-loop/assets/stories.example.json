@@ -1,0 +1,64 @@
+{
+  "project": "Task tracker",
+  "branchName": "agent/task-priority",
+  "description": "Task priority: store, show, edit and filter a priority on each task.",
+  "verifyCommand": "npm run verify",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Store a priority on each task",
+      "description": "As a developer, I need each task to keep a priority so that it survives restarts.",
+      "acceptanceCriteria": [
+        "Migration adds a priority column with the values high, medium and low, default medium",
+        "The migration runs forward and back on an empty test database",
+        "Typecheck and tests pass"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Return the priority from the tasks API",
+      "description": "As a client, I want the priority in every task response so that I can display it.",
+      "acceptanceCriteria": [
+        "GET /tasks and GET /tasks/{id} include priority",
+        "Contract test covers the new field",
+        "Typecheck and tests pass"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-001"]
+    },
+    {
+      "id": "US-003",
+      "title": "Show a priority badge on each task card",
+      "description": "As a user, I want to see each task's priority at a glance.",
+      "acceptanceCriteria": [
+        "Each task card shows a badge with the priority as text, not colour alone",
+        "End-to-end test checks the badge in a browser",
+        "Typecheck and tests pass"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-002"]
+    },
+    {
+      "id": "US-004",
+      "title": "Filter the task list by priority",
+      "description": "As a user, I want to list only high-priority tasks.",
+      "acceptanceCriteria": [
+        "Filter control offers All, High, Medium and Low and keeps the choice in the URL",
+        "An empty result shows a message instead of a blank list",
+        "End-to-end test checks the filter in a browser",
+        "Typecheck and tests pass"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": "",
+      "dependsOn": ["US-002"]
+    }
+  ]
+}
